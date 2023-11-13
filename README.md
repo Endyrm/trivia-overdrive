@@ -15,7 +15,9 @@ I'm a huge proponent of free and open source software, regardless of how bad or 
 
 The following is a copy of the license, which can also be found under the LICENSE file:
 
-Copyright (c) 2023 Lexi Charron
+
+
+**Copyright (c) 2023 Lexi Charron**
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
