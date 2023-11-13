@@ -1,6 +1,13 @@
 # Trivia Overdrive
 Trivia Overdrive is a fun and simple terminal-based trivia game intended for my final project of the Microprocessors I course. It also utilizes PDcurses for UI, as an extra fun attempt at UI/UX eye-candy and a personal challenge for bettering my skills. Of course, this is primarily built for use on Windows for the purpose of project requirements.
 
+## TODO:
+The following are my goals with this project, as for what I can achieve by the submission date or beyond.
+- [ ] Write the core functionality: the main functions that allow me to track scores, hold the questions, etc.
+- [ ] Write the curses UI: the primary UI of the project
+- [ ] Allow for compilation with GCC: since the project is built in VS2022, the project is built on principles of MSVC. I would prefer using a platform-agnostic compiler long term so that this code may be more useful. 
+
+
 ## The key requirements of the project
 The project was subjected to several requirements as to allow for streamlined grading guidelines by the professor. Such requirements were (but not limited to):
 * Utilizing arrays for storing the questions;
