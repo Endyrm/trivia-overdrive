@@ -4,8 +4,16 @@
 
 #include <ncurses.h>
 
+// function prototypes for general window manipulation
+WINDOW *CreateNewWin(int height, int width, int startY, int startX);
+WINDOW *CreateNewWinBoxed(int height, int width, int startY, int startX);
+void DestroyWin(WINDOW *localWindow);
 
-int UpdateScreen(int sig) {
+
+
+
+
+void UpdateScreen(int sig) {
     endwin();
     refresh();
 
@@ -17,27 +25,22 @@ int UpdateScreen(int sig) {
     switch (varY) { case 0 ... 9: varY = 1; break; case 10 ... 99: varY = 2; break; default: varY = 3; break;};
     int variableXLength = 20+varX;
     
-    // The concept is to show this message on a window overlapping stdscr, though I evidently do not fully comprehend this for now.
-
-    //if (smallScrTrig != 0)
-    //{
-    //    
-    //    WINDOW *smallWin=newwin((maxY/2)-3, (maxX-28)/2, 5, 28);
-    //    int createsmallWin = smallWin;
-    //    box(smallWin, 0, 0);
-    //}
+    // TODO: make window data pause all inputs in favor for ensuring the resize \
+       prompt does not disappear and carry on accepting inputs when it's too small. \
+       Make it show the screen once the conflict is resolved, resume input afterwards.
+    
 
     if (maxX < 80 || maxY < 20) {
         clear();
-        
+        WINDOW *resizeWin;
+
+        resizeWin = CreateNewWinBoxed(5, 30, (maxY / 2), (maxX - 30) / 2);
         //int smallWin = newwin(maxY, maxX, 0, 0);
-        mvwprintw(stdscr, (maxY / 2) - 1, (maxX - 26) / 2, "Please resize your screen.");
-        mvwprintw(stdscr, (maxY / 2), (maxX - variableXLength) / 2, "(Current size: %d, %d)", maxX, maxY);
-        mvwprintw(stdscr, (maxY / 2) + 1, (maxX - 22) / 2, "(Minimum size: 80, 20)");
-        wrefresh(stdscr); // Refresh the screen
-    } //else {
-    //    delwin("smallWin");
-    //}
+        mvwprintw(resizeWin, 1, 2, "Please resize your screen.");
+        mvwprintw(resizeWin, 2, (5 - varX), "(Current size: %d, %d)", maxX, maxY);
+        mvwprintw(resizeWin, 3, 4, "(Minimum size: 80, 20)");
+        wrefresh(resizeWin); // Refresh the screen
+    }
 
     
 }
@@ -54,3 +57,27 @@ void InitializeScreen() {
 }
 
 
+
+
+WINDOW *CreateNewWin(int height, int width, int startY, int startX)
+{
+    WINDOW *localWindow;
+
+    // Create the window with a standard box on the border.
+    localWindow = newwin(height, width, startY, startX);
+    wrefresh(localWindow);
+
+    return localWindow;
+}
+
+WINDOW *CreateNewWinBoxed(int height, int width, int startY, int startX)
+{
+    WINDOW *localWindow;
+
+    // Create the window with a standard box on the border
+    localWindow = newwin(height, width, startY, startX);
+    box (localWindow, 0, 0);
+    wrefresh(localWindow);
+
+    return localWindow;
+}
