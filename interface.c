@@ -34,7 +34,7 @@ void UpdateScreen(int sig) {
         clear();
         WINDOW *resizeWin;
 
-        resizeWin = CreateNewWinBoxed(5, 30, (maxY / 2), (maxX - 30) / 2);
+        resizeWin = CreateNewWinBoxed(5, 30, (maxY / 2) - 3, (maxX - 30) / 2);
         //int smallWin = newwin(maxY, maxX, 0, 0);
         mvwprintw(resizeWin, 1, 2, "Please resize your screen.");
         mvwprintw(resizeWin, 2, (5 - varX), "(Current size: %d, %d)", maxX, maxY);
