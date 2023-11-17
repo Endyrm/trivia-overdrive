@@ -4,16 +4,22 @@
 
 #include <ncurses.h>
 
+WINDOW *mainWindow;
+
 // function prototypes for general window manipulation
 WINDOW *CreateNewWin(int height, int width, int startY, int startX);
 WINDOW *CreateNewWinBoxed(int height, int width, int startY, int startX);
 void DestroyWin(WINDOW *localWindow);
 
 // Function prototypes for the interface
-int VerifyMinimumScreenSize();
+void VerifyMinimumScreenSize();
+int IsInputBlocked();
 
 
 void IntroSequence() {
+    int maxY, maxX;
+    getmaxyx(stdscr, maxY, maxX);
+    mainWindow = CreateNewWinBoxed(30, 80, (maxY / 2) - 15, (maxX - 40) / 2);
 
 }
 
@@ -23,18 +29,11 @@ void UpdateScreen(int sig) {
     endwin();
     refresh();
 
-    // Prevent early segfault
-    if (VerifyMinimumScreenSize() == 1) {
-        //mvwprintw(stdscr, 2, 1, "isInputBlocked = 1"); DEBUG
-        return;
-    } else if (VerifyMinimumScreenSize() == 0) {
-        //mvwprintw(stdscr, 2, 1, "isInputBlocked = 0"); DEBUG
-        return;
-    }
+    VerifyMinimumScreenSize();
 }
 
 // Verify the minimum screen size to ensure smooth sailing
-int VerifyMinimumScreenSize()
+void VerifyMinimumScreenSize()
 {
     // Declare and initialize variables required for the resize window prompt
     int varX = 0, varY = 0, smallScrTrig = -1;
@@ -45,11 +44,6 @@ int VerifyMinimumScreenSize()
     switch (varX) { case 0 ... 9: varX = 1; break; case 10 ... 99: varX = 2; break; default: varX = 3; break;};
     switch (varY) { case 0 ... 9: varY = 1; break; case 10 ... 99: varY = 2; break; default: varY = 3; break;};
     int variableXLength = 20+varX;
-    
-    // TODO: make window data pause all inputs in favor for ensuring the resize \
-       prompt does not disappear and carry on accepting inputs when it's too small. \
-       Make it show the screen once the conflict is resolved, resume input afterwards.
-    
 
     // Check if the screen is below minimums
     if (maxX < 80 || maxY < 30) {
@@ -63,9 +57,21 @@ int VerifyMinimumScreenSize()
         mvwprintw(resizeWin, 2, (5 - varX), "(Current size: %d, %d)", maxX, maxY);
         mvwprintw(resizeWin, 3, 4, "(Minimum size: 80, 30)");
         wrefresh(resizeWin); 
-        return 1;
+    
     } 
-    return 0;
+}
+
+// Helper to block input when not required
+int IsInputBlocked() {
+    int maxX, maxY;
+    getmaxyx(stdscr, maxY, maxX);
+    if (maxX < 80 || maxY < 30) {
+        // Block input
+        return 1;
+    } else {
+        // Don't block input
+        return 0;
+    }
 }
 
 // This starts the screen function, along with required options
