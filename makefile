@@ -5,4 +5,4 @@ copyright:
 	@sleep 2
 
 gen:
-	gcc index.c -lncurses -ltinfo
+	gcc index.c -lncurses -lpanel -ltinfo

@@ -3,8 +3,10 @@
 // @author Lexi Charron
 
 #include <ncurses.h>
+#include <panel.h>
 
-WINDOW *mainWindow;
+WINDOW *mainWindow[10];
+PANEL *mainPanel[10];
 
 // function prototypes for general window manipulation
 WINDOW *CreateNewWin(int height, int width, int startY, int startX);
@@ -14,12 +16,35 @@ void DestroyWin(WINDOW *localWindow);
 // Function prototypes for the interface
 void VerifyMinimumScreenSize();
 int IsInputBlocked();
-
+int maxY, maxX;
 
 void IntroSequence() {
-    int maxY, maxX;
+    
     getmaxyx(stdscr, maxY, maxX);
-    mainWindow = CreateNewWinBoxed(30, 80, (maxY / 2) - 15, (maxX - 40) / 2);
+    // Create each component of the main window
+    mainWindow[0] = CreateNewWinBoxed(30, 80, (maxY / 2) - 15, (maxX - 80) / 2);
+    mainWindow[1] = CreateNewWinBoxed(6, 40, (maxY / 2) - 9, (maxX - 40) / 2);
+    // Set them as panels for the refresh order. from now on, panel utilities are prefered.
+    mainPanel[0] = new_panel(mainWindow[0]);
+    mainPanel[1] = new_panel(mainWindow[1]);
+    mvwprintw(mainWindow[1], 2, 4, "Copyright (C) Lexi Charron, 2023");
+    mvwprintw(mainWindow[1], 3, 5, "Licensed under the MIT license");
+
+    for (int i = 0; i <=24; i++)
+    {
+        // Set the colors of the windows + smooth text transition
+        int d = i;
+        if (i > 11) { d = i+13; }
+        wbkgd(mainWindow[0], COLOR_PAIR(i));
+        wbkgd(mainWindow[1], COLOR_PAIR(d));
+        update_panels();
+        doupdate();
+    
+        // Calculate a smooth transition while allowing for 2 second read time
+        int ms = 250 - (i*10);
+        if (i == 0) {ms = 2000; } else if (ms < 50) { ms = 50; };
+        msleep(ms);
+    }
 
 }
 
@@ -28,6 +53,7 @@ void UpdateScreen(int sig) {
     // Refresh the screen
     endwin();
     refresh();
+    update_panels();
 
     VerifyMinimumScreenSize();
 }
@@ -37,7 +63,7 @@ void VerifyMinimumScreenSize()
 {
     // Declare and initialize variables required for the resize window prompt
     int varX = 0, varY = 0, smallScrTrig = -1;
-    int maxY, maxX;
+
     getmaxyx(stdscr, maxY, maxX);
 
     // Determine correct spacing for best attempt centering of text
@@ -58,7 +84,9 @@ void VerifyMinimumScreenSize()
         mvwprintw(resizeWin, 3, 4, "(Minimum size: 80, 30)");
         wrefresh(resizeWin); 
     
-    } 
+    }
+    refresh();
+    update_panels(); 
 }
 
 // Helper to block input when not required
@@ -76,10 +104,12 @@ int IsInputBlocked() {
 
 // This starts the screen function, along with required options
 void InitializeScreen() {
-    // Start the ncurses screen
+    // Start the ncurses screen with color
     initscr();
+    start_color();
 
-    // Disable control characters; disable buffering, enable function/keypad keys
+    // Disable control characters; invisible cursor; disable buffering, enable function/keypad keys
+    curs_set(0);
     raw();
     noecho();
     keypad(stdscr, TRUE);
@@ -154,3 +184,4 @@ void DestroyWin(WINDOW *localWindow) {
     wrefresh(localWindow);
     delwin(localWindow);
 }
+

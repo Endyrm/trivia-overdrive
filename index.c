@@ -10,15 +10,16 @@
 #include <math.h>
 #include <time.h>
 #include <ncurses.h>
+#include <panel.h>
 #include <signal.h>
 #include <errno.h>
 
 // Include program-specifc functions
+#include "colors.c"
+#include "utils.c"
 #include "core.c"
 #include "interface.c"
 #include "sounds.c"
-#include "utils.c"
-
 
 
 
@@ -39,11 +40,19 @@ int main() {
             mvwprintw(stdscr, 1, 1, "(i) Increase screen size, then press any key.");
             wrefresh(stdscr);
             getch();
+        } else if (isInputBlocked == 0) {
+            // I had no time or energy to fully make this program auto resize due to the time limitation.
+            mvwprintw(stdscr, 1, 1, "(i) Make sure to not resize the screen during gameplay beyond this.");
+            mvwprintw(stdscr, 2, 5, "You will avoid unintended yet unavoidable behavior by respecting this requirement.");
+            mvwprintw(stdscr, 4, 5, "(Press any key to begin...)");
+            getch();
         }
     } while (isInputBlocked == 1);
     clear();
-
-
+    DefineColorPairs();
+    // Start the intro sequence towards the main menu
+    IntroSequence();
+    // Keybind test for debugging purposes
     int ch;
     while((ch = getch()) != '\n')
     {
