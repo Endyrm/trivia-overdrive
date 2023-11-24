@@ -9,7 +9,9 @@
 #include <ctype.h>
 #include <math.h>
 #include <time.h>
+#include <string.h>
 #include <sndfile.h>
+#include <fcntl.h>
 #include <ncurses.h>
 #include <panel.h>
 #include <signal.h>
