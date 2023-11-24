@@ -42,7 +42,7 @@ void DefineColorPairs() {
     init_pair(23, 232, 255);
     init_pair(24, 232, 231);
 
-    // for text fade
+    // for monochrome text fade
     init_pair(25, 231, 244);
     init_pair(26, 231, 245);
     init_pair(27, 231, 246);
@@ -56,4 +56,12 @@ void DefineColorPairs() {
     init_pair(35, 231, 254);
     init_pair(36, 231, 255);
     init_pair(37, 231, 231);
+
+    // workaround for a weird color profile issue
+    init_pair(38, 231, 232);
+
+    // color text
+    init_pair(39, 141, 232); // MediumPurple1 on hsl(0,0%,3%)
+    init_pair(40, 141, 189); // MediumPurple1 on LightSteelBlue1
+    init_pair(41, 244, 232); // hsl(0,0%,50%) on hsl(0,0%,3%)
 }

@@ -9,17 +9,19 @@
 #include <ctype.h>
 #include <math.h>
 #include <time.h>
+#include <sndfile.h>
 #include <ncurses.h>
 #include <panel.h>
 #include <signal.h>
 #include <errno.h>
+#include <unistd.h>
 
 // Include program-specifc functions
 #include "colors.c"
 #include "utils.c"
+#include "sounds.c"
 #include "core.c"
 #include "interface.c"
-#include "sounds.c"
 
 
 
@@ -52,28 +54,16 @@ int main() {
     DefineColorPairs();
     // Start the intro sequence towards the main menu
     IntroSequence();
+    // Main menu initialization -- from now on all UI code runs under interface.c functions
+    MainMenu(1); // the 1 triggers the flash
+    
+    
+    
+    
+    
     // Keybind test for debugging purposes
-    int ch;
-    while((ch = getch()) != '\n')
-    {
-        isInputBlocked = IsInputBlocked();
-        if (isInputBlocked == 0)
-        {
-            switch (ch) {
-                case KEY_F(1):
-                    endwin();
-                    return 0;
-                case KEY_F(3):
-                    printw("sample text, ");
-                    break;
-                case KEY_F(12):
-                    ShowLicense();
-                    break;
-               default:
-                    break;
-            }
-        }
-    }
+    
     endwin();
+    printf("something made the program quit early\n");
     return 0;
 }
