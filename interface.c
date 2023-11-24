@@ -200,27 +200,29 @@ void MainMenu(int isFirstRun)
                     for (int v = 0; v < 15; v++)
                     {
                        int u = v-2;
-                       if (v >= 2) { mvwaddch(mainWindow[3], 0, u, startBtn[0][v] | COLOR_PAIR(40) | A_BOLD); }
+                       if (v >= 2) { mvwaddch(mainWindow[3], 0, u, startBtn[0][u] | COLOR_PAIR(40) | A_BOLD); }
                        mvwaddch(mainWindow[3], 1, v, startBtn[1][v] | COLOR_PAIR(40) | A_BOLD);
-                       if (u >= 2) { mvwaddch(mainWindow[3], 2, u, startBtn[3][v] | COLOR_PAIR(40) | A_BOLD); }
+                       if (u >= 2) { mvwaddch(mainWindow[3], 2, u, startBtn[3][u-2] | COLOR_PAIR(40) | A_BOLD); }
                     }
                      }
         // "Options" button
         if (i == 50) { 
                     for (int v = 0; v < 15; v++)
                     {
-                       mvwaddch(mainWindow[4], 0, 0, optionsBtn[0][v] | COLOR_PAIR(40) | A_BOLD);
-                       mvwaddch(mainWindow[4], 1, 0, optionsBtn[2][v] | COLOR_PAIR(40) | A_BOLD);
-                       mvwaddch(mainWindow[4], 2, 2, optionsBtn[3][v] | COLOR_PAIR(40) | A_BOLD);
+                       int u = v-2;
+                       if (v >= 2) { mvwaddch(mainWindow[4], 0, u, optionsBtn[0][u] | COLOR_PAIR(40) | A_BOLD); }
+                       mvwaddch(mainWindow[4], 1, v, optionsBtn[2][v] | COLOR_PAIR(40) | A_BOLD);
+                       if (u >= 2) { mvwaddch(mainWindow[4], 2, u, optionsBtn[3][u-2] | COLOR_PAIR(40) | A_BOLD); }
                     }
                      }
         // "Exit game" button
         if (i == 70) { 
                     for (int v = 0; v < 15; v++)
                     {
-                       mvwaddch(mainWindow[5], 0, 0, exitBtn[0][v] | COLOR_PAIR(40) | A_BOLD);
-                       mvwaddch(mainWindow[5], 1, 0, exitBtn[2][v] | COLOR_PAIR(40) | A_BOLD);
-                       mvwaddch(mainWindow[5], 2, 2, exitBtn[3][v] | COLOR_PAIR(40) | A_BOLD);
+                       int u = v-2;
+                       if (v >= 2) { mvwaddch(mainWindow[5], 0, u, exitBtn[0][u] | COLOR_PAIR(40) | A_BOLD); }
+                       mvwaddch(mainWindow[5], 1, v, exitBtn[2][v] | COLOR_PAIR(40) | A_BOLD);
+                       if (u >= 2) { mvwaddch(mainWindow[5], 2, u, exitBtn[3][u-2] | COLOR_PAIR(40) | A_BOLD); }
                     }
                      }
 
@@ -260,22 +262,32 @@ void MainMenu(int isFirstRun)
         // Set the correct highlight indicator
         if (selector == 1)
         {
-            mvwaddstr(mainWindow[3], 1, 0, startBtn[1]);
-            mvwaddstr(mainWindow[4], 1, 0, optionsBtn[2]);
-            mvwaddstr(mainWindow[5], 1, 0, exitBtn[2]);
+            for (int v = 0; v < 15; v++)
+            {
+                mvwaddch(mainWindow[3], 1, v, startBtn[1][v] | COLOR_PAIR(40) | A_BOLD);
+                mvwaddch(mainWindow[4], 1, v, optionsBtn[2][v] | COLOR_PAIR(40) | A_BOLD);
+                mvwaddch(mainWindow[5], 1, v, exitBtn[2][v] | COLOR_PAIR(40) | A_BOLD);
+            }
         } else if (selector == 2)
         {
-            mvwaddstr(mainWindow[3], 1, 0, startBtn[2]);
-            mvwaddstr(mainWindow[4], 1, 0, optionsBtn[1]);
-            mvwaddstr(mainWindow[5], 1, 0, exitBtn[2]);
+            for (int v = 0; v < 15; v++)
+            {
+                mvwaddch(mainWindow[3], 1, v, startBtn[2][v] | COLOR_PAIR(40) | A_BOLD);
+                mvwaddch(mainWindow[4], 1, v, optionsBtn[1][v] | COLOR_PAIR(40) | A_BOLD);
+                mvwaddch(mainWindow[5], 1, v, exitBtn[2][v] | COLOR_PAIR(40) | A_BOLD);
+            }
         } else if (selector == 3)
         {
-            mvwaddstr(mainWindow[3], 1, 0, startBtn[2]);
-            mvwaddstr(mainWindow[4], 1, 0, optionsBtn[2]);
-            mvwaddstr(mainWindow[5], 1, 0, exitBtn[1]);
+            for (int v = 0; v < 15; v++)
+            {
+                mvwaddch(mainWindow[3], 1, v, startBtn[2][v] | COLOR_PAIR(40) | A_BOLD);
+                mvwaddch(mainWindow[4], 1, v, optionsBtn[2][v] | COLOR_PAIR(40) | A_BOLD);
+                mvwaddch(mainWindow[5], 1, v, exitBtn[1][v] | COLOR_PAIR(40) | A_BOLD);
+            }
         }
         update_panels();
         doupdate();
+        msleep(25);
 
         isInputBlocked = IsInputBlocked();
         if (isInputBlocked == 0)
@@ -294,7 +306,7 @@ void MainMenu(int isFirstRun)
                 // Make the selector move forward
                 selector++;
                 if (selector > 3) { selector = 1; }
-                mvprintw(maxY-2, 0, "[main/DEBUG]: selector is: %d  ", selector);
+               (maxY-2, 0, "[main/DEBUG]: selector is: %d  ", selector);
                 break;
                 case KEY_F(1):
                     endwin();
@@ -320,6 +332,35 @@ void MainMenu(int isFirstRun)
                     break;
             }
         }
+
+        // WIN32: do it again for good measure as stuff tends to go apeshit on it
+        if (selector == 1)
+        {
+            for (int v = 0; v < 15; v++)
+            {
+                mvwaddch(mainWindow[3], 1, v, startBtn[1][v] | COLOR_PAIR(40) | A_BOLD);
+                mvwaddch(mainWindow[4], 1, v, optionsBtn[2][v] | COLOR_PAIR(40) | A_BOLD);
+                mvwaddch(mainWindow[5], 1, v, exitBtn[2][v] | COLOR_PAIR(40) | A_BOLD);
+            }
+        } else if (selector == 2)
+        {
+            for (int v = 0; v < 15; v++)
+            {
+                mvwaddch(mainWindow[3], 1, v, startBtn[2][v] | COLOR_PAIR(40) | A_BOLD);
+                mvwaddch(mainWindow[4], 1, v, optionsBtn[1][v] | COLOR_PAIR(40) | A_BOLD);
+                mvwaddch(mainWindow[5], 1, v, exitBtn[2][v] | COLOR_PAIR(40) | A_BOLD);
+            }
+        } else if (selector == 3)
+        {
+            for (int v = 0; v < 15; v++)
+            {
+                mvwaddch(mainWindow[3], 1, v, startBtn[2][v] | COLOR_PAIR(40) | A_BOLD);
+                mvwaddch(mainWindow[4], 1, v, optionsBtn[2][v] | COLOR_PAIR(40) | A_BOLD);
+                mvwaddch(mainWindow[5], 1, v, exitBtn[1][v] | COLOR_PAIR(40) | A_BOLD);
+            }
+        }
+        update_panels();
+        doupdate();
     }
 }
 

@@ -26,11 +26,11 @@ void playRevealSound();     // Used for the intro sound that reveals the main me
 
 void PlayAudio(char *fileName)
 {
-    // Create a command string with the filename
+    // Create a command string with the fileName
     char command[256];
     sprintf(command, "vlc --quiet --intf dummy --play-and-exit %s &> /dev/null", fileName);
 
-    // Execute the command
+    // Play the audio via command execution
     system(command);
 }
 
@@ -52,7 +52,7 @@ void ForkAndDetach(char *fileName)
         // Child process, detach from the parent process
         setsid();
 
-        // Call the PlayAudio function with the filename
+        // Call the PlayAudio function to play the audio
         PlayAudio(fileName);
 
         // Exit the child process
