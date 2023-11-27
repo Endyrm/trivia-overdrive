@@ -200,9 +200,9 @@ void MainMenu(int isFirstRun)
                     for (int v = 0; v < 15; v++)
                     {
                        int u = v-2;
-                       if (v >= 2) { mvwaddch(mainWindow[3], 0, u, startBtn[0][u] | COLOR_PAIR(40) | A_BOLD); }
+                       if (v <= 12) { mvwaddch(mainWindow[3], 0, v, startBtn[0][v] | COLOR_PAIR(40) | A_BOLD); }
                        mvwaddch(mainWindow[3], 1, v, startBtn[1][v] | COLOR_PAIR(40) | A_BOLD);
-                       if (u >= 2) { mvwaddch(mainWindow[3], 2, u, startBtn[3][u-2] | COLOR_PAIR(40) | A_BOLD); }
+                       if (v >= 2) { mvwaddch(mainWindow[3], 2, v, startBtn[3][u] | COLOR_PAIR(40) | A_BOLD); }
                     }
                      }
         // "Options" button
@@ -210,9 +210,9 @@ void MainMenu(int isFirstRun)
                     for (int v = 0; v < 15; v++)
                     {
                        int u = v-2;
-                       if (v >= 2) { mvwaddch(mainWindow[4], 0, u, optionsBtn[0][u] | COLOR_PAIR(40) | A_BOLD); }
+                       if (v <= 12) { mvwaddch(mainWindow[4], 0, v, optionsBtn[0][v] | COLOR_PAIR(40) | A_BOLD); }
                        mvwaddch(mainWindow[4], 1, v, optionsBtn[2][v] | COLOR_PAIR(40) | A_BOLD);
-                       if (u >= 2) { mvwaddch(mainWindow[4], 2, u, optionsBtn[3][u-2] | COLOR_PAIR(40) | A_BOLD); }
+                       if (v >= 2) { mvwaddch(mainWindow[4], 2, v, optionsBtn[3][u] | COLOR_PAIR(40) | A_BOLD); }
                     }
                      }
         // "Exit game" button
@@ -220,9 +220,9 @@ void MainMenu(int isFirstRun)
                     for (int v = 0; v < 15; v++)
                     {
                        int u = v-2;
-                       if (v >= 2) { mvwaddch(mainWindow[5], 0, u, exitBtn[0][u] | COLOR_PAIR(40) | A_BOLD); }
+                       if (v <= 12) { mvwaddch(mainWindow[5], 0, v, exitBtn[0][v] | COLOR_PAIR(40) | A_BOLD); }
                        mvwaddch(mainWindow[5], 1, v, exitBtn[2][v] | COLOR_PAIR(40) | A_BOLD);
-                       if (u >= 2) { mvwaddch(mainWindow[5], 2, u, exitBtn[3][u-2] | COLOR_PAIR(40) | A_BOLD); }
+                       if (v >= 2) { mvwaddch(mainWindow[5], 2, v, exitBtn[3][u] | COLOR_PAIR(40) | A_BOLD); }
                     }
                      }
 
@@ -248,45 +248,26 @@ void MainMenu(int isFirstRun)
         if (d <=  83 && d >= 11) { mvwaddch(mainWindow[2],  3, d-12, asciiArt[2][d-12]); }
         if (d <=  82 && d >= 10) { mvwaddch(mainWindow[2],  2, d-11, asciiArt[1][d-11]); }
         if (d <=  81 && d >=  9) { mvwaddch(mainWindow[2],  1, d-10, asciiArt[0][d-10]); }
+       
+        // Update the screen every 25ms as per the animation's speed
         update_panels();
         doupdate();
-
         msleep(25);
     }
+
+    // Add the input hints at the bottom of the window, then update screen
+    mvwprintw(mainWindow[0], 29, 3, " (F1): Exit Now ");
+    mvwprintw(mainWindow[0], 29, 31, " (^) (<) (v) (>) ");
+    mvwprintw(mainWindow[0], 29, 60, " (ENTER): Select ");
+    update_panels();
+    doupdate();
 
     // The menu keybinds and logic for responsive UI
     int isInputBlocked, ch, selector = 1;
     isInputBlocked = IsInputBlocked();
     while((ch = getch()) != KEY_F(13)) // F13 is a nonstandard key
     {
-        // Set the correct highlight indicator
-        if (selector == 1)
-        {
-            for (int v = 0; v < 15; v++)
-            {
-                mvwaddch(mainWindow[3], 1, v, startBtn[1][v] | COLOR_PAIR(40) | A_BOLD);
-                mvwaddch(mainWindow[4], 1, v, optionsBtn[2][v] | COLOR_PAIR(40) | A_BOLD);
-                mvwaddch(mainWindow[5], 1, v, exitBtn[2][v] | COLOR_PAIR(40) | A_BOLD);
-            }
-        } else if (selector == 2)
-        {
-            for (int v = 0; v < 15; v++)
-            {
-                mvwaddch(mainWindow[3], 1, v, startBtn[2][v] | COLOR_PAIR(40) | A_BOLD);
-                mvwaddch(mainWindow[4], 1, v, optionsBtn[1][v] | COLOR_PAIR(40) | A_BOLD);
-                mvwaddch(mainWindow[5], 1, v, exitBtn[2][v] | COLOR_PAIR(40) | A_BOLD);
-            }
-        } else if (selector == 3)
-        {
-            for (int v = 0; v < 15; v++)
-            {
-                mvwaddch(mainWindow[3], 1, v, startBtn[2][v] | COLOR_PAIR(40) | A_BOLD);
-                mvwaddch(mainWindow[4], 1, v, optionsBtn[2][v] | COLOR_PAIR(40) | A_BOLD);
-                mvwaddch(mainWindow[5], 1, v, exitBtn[1][v] | COLOR_PAIR(40) | A_BOLD);
-            }
-        }
-        update_panels();
-        doupdate();
+        
         msleep(25);
 
         isInputBlocked = IsInputBlocked();
@@ -306,7 +287,7 @@ void MainMenu(int isFirstRun)
                 // Make the selector move forward
                 selector++;
                 if (selector > 3) { selector = 1; }
-               (maxY-2, 0, "[main/DEBUG]: selector is: %d  ", selector);
+                mvprintw(maxY-2, 0, "[main/DEBUG]: selector is: %d  ", selector);
                 break;
                 case KEY_F(1):
                     endwin();
@@ -316,10 +297,25 @@ void MainMenu(int isFirstRun)
                 switch(selector)
                 {
                     case 1:
-                        // call start game function
+                        // Remove all main menu-specific windows
+                        del_panel(mainPanel[1]); DestroyWin(mainWindow[1]);
+                        del_panel(mainPanel[2]); DestroyWin(mainWindow[2]);
+                        del_panel(mainPanel[3]); DestroyWin(mainWindow[3]);
+                        del_panel(mainPanel[4]); DestroyWin(mainWindow[4]);
+                        del_panel(mainPanel[5]); DestroyWin(mainWindow[5]);
+
+                        // Then start the game with the topic selector
+                        StartGameTopicSelect();
                         break;
                     case 2:
                         // call options menu, temp junk for now
+                        del_panel(mainPanel[1]); DestroyWin(mainWindow[1]);
+                        del_panel(mainPanel[2]); DestroyWin(mainWindow[2]);
+                        del_panel(mainPanel[3]); DestroyWin(mainWindow[3]);
+                        del_panel(mainPanel[4]); DestroyWin(mainWindow[4]);
+                        del_panel(mainPanel[5]); DestroyWin(mainWindow[5]);
+                        update_panels();
+                        doupdate();
                         ShowLicense();
                         MainMenu(0);
                         break;
@@ -333,7 +329,7 @@ void MainMenu(int isFirstRun)
             }
         }
 
-        // WIN32: do it again for good measure as stuff tends to go apeshit on it
+        // WIN32: do it again for good measure as stuff tends to get weird on the windows terminal
         if (selector == 1)
         {
             for (int v = 0; v < 15; v++)
@@ -363,6 +359,354 @@ void MainMenu(int isFirstRun)
         doupdate();
     }
 }
+
+
+void StartGameTopicSelect()
+{
+    // Flash the screen as we show the topic
+    for (int i = 24; i > 0; i--)
+    {
+        int d = i;
+        if (i == 0) { d = 38; }
+        wbkgd(mainWindow[0], COLOR_PAIR(d));
+        update_panels();
+        doupdate();
+    
+        // Calculate a smooth flash
+        int ms = 50;
+        if (i == 0) {ms = 5; }
+        msleep(ms);
+    }
+    // Set the right background color of the window
+    wbkgd(mainWindow[0], COLOR_PAIR(38));
+
+    // Create the relevant windows for topic selection, set correct background color
+    mainWindow[1] = CreateNewWin(7,  72, (maxY / 2) - 14, (maxX - 72) / 2); // menu title
+    mainWindow[2] = CreateNewWin(3,  15, (maxY / 2) -  3, (maxX - 60) / 2); // random topic button
+    mainWindow[3] = CreateNewWin(3,  15, (maxY / 2) +  3, (maxX - 50) / 2); // Butchery topic button
+    mainWindow[4] = CreateNewWin(3,  15, (maxY / 2) +  9, (maxX - 60) / 2); // Cities of Canada topic button
+    mainWindow[5] = CreateNewWin(3,  15, (maxY / 2) -  3, (maxX + 30) / 2); // Social Media Platforms topic button
+    mainWindow[6] = CreateNewWin(3,  15, (maxY / 2) +  3, (maxX + 20) / 2); // Elements topic button
+    mainWindow[7] = CreateNewWin(3,  15, (maxY / 2) +  9, (maxX + 30) / 2); // Web Browser topic button
+    mainWindow[8] = CreateNewWin(1,  78, (maxY / 2) -  6, (maxX - 78) / 2); // Context selection for exact topic name
+    mainPanel[1] = new_panel(mainWindow[1]);
+    mainPanel[2] = new_panel(mainWindow[2]);
+    mainPanel[3] = new_panel(mainWindow[3]);
+    mainPanel[4] = new_panel(mainWindow[4]);
+    mainPanel[5] = new_panel(mainWindow[5]);
+    mainPanel[6] = new_panel(mainWindow[6]);
+    mainPanel[7] = new_panel(mainWindow[7]);
+    mainPanel[8] = new_panel(mainWindow[8]);
+    for (int i = 1; i <= 8; i++) { wbkgd(mainWindow[i], COLOR_PAIR(38)); }
+    update_panels();
+    doupdate();
+
+
+
+    char menuTitle[7][72] = {
+        { " ____       _           _                   _____           _        _  " },
+        { "/ ___|  ___| | ___  ___| |_       __ _     |_   _|__  _ __ (_) ___  | | " },
+        { "\\___ \\ / _ \\ |/ _ \\/ __| __|     / _` |      | |/ _ \\| '_ \\| |/ __| | | " },
+        { " ___) |  __/ |  __/ (__| |_     | (_| |      | | (_) | |_) | | (__  |_| " },
+        { "|____/ \\___|_|\\___|\\___|\\__|     \\__,_|      |_|\\___/| .__/|_|\\___| (_) " },
+        { "                                                     |_|                " },
+        { "       Select the topic you would like to test your skills with!        " }
+    };
+
+    char randTopicBtn[4][15] =
+    {
+        { "             " },
+        { " -> RANDOM! <- " },
+        { "    RANDOM!    " },
+        { "             " }
+    };
+
+    char topic1Btn[4][15] =
+    {
+        { "             " },
+        { " --> MEATS <-- " },
+        { "     MEATS     " },
+        { "             " }
+    };
+
+    char topic2Btn[4][15] =
+    {
+        { "             " },
+        { " --> TOWNS <-- " },
+        { "     TOWNS     " },
+        { "             " }
+    };
+
+    char topic3Btn[4][15] =
+    {
+        { "             " },
+        { " --> MEDIA <-- " },
+        { "     MEDIA     " },
+        { "             " }
+    };
+
+    char topic4Btn[4][15] =
+    {
+        { "             " },
+        { " -> ELEMENT <- " },
+        { "    ELEMENT    " },
+        { "             " }
+    };
+
+    char topic5Btn[4][15] =
+    {
+        { "             " },
+        { " -> BROWSER <- " },
+        { "    BROWSER    " },
+        { "             " }
+    };
+
+    // Start the animation immediately after the flash
+    for (int i = 0; i <= 100; i++)
+    {
+        // Have the menu-specific title appear character by character
+        if (i >=  0) { mvwaddch(mainWindow[1], 0, i,    menuTitle[0][i]    | A_BOLD | COLOR_PAIR(39) ); }
+        if (i >=  5) { mvwaddch(mainWindow[1], 1, i-5,  menuTitle[1][i-5]  | A_BOLD | COLOR_PAIR(39) ); }
+        if (i >= 10) { mvwaddch(mainWindow[1], 2, i-10, menuTitle[2][i-10] | A_BOLD | COLOR_PAIR(39) ); }
+        if (i >= 15) { mvwaddch(mainWindow[1], 3, i-15, menuTitle[3][i-15] | A_BOLD | COLOR_PAIR(39) ); }
+        if (i >= 20) { mvwaddch(mainWindow[1], 4, i-20, menuTitle[4][i-20] | A_BOLD | COLOR_PAIR(39) ); }
+        if (i >= 25) { mvwaddch(mainWindow[1], 5, i-25, menuTitle[5][i-25] | A_BOLD | COLOR_PAIR(39) ); }
+        if (i >= 30) { mvwaddch(mainWindow[1], 6, i-30, menuTitle[6][i-30] | A_BOLD | COLOR_PAIR(39) ); }
+
+
+
+        // "Random selection" button
+        if (i == 30) { 
+                    for (int v = 0; v < 15; v++)
+                    {
+                       int u = v-2;
+                       if (v <= 12) { mvwaddch(mainWindow[2], 0, v, randTopicBtn[0][v] | COLOR_PAIR(40) | A_BOLD); }
+                       mvwaddch(mainWindow[2], 1, v, randTopicBtn[1][v] | COLOR_PAIR(40) | A_BOLD);
+                       if (v >= 2) { mvwaddch(mainWindow[2], 2, v, randTopicBtn[3][u] | COLOR_PAIR(40) | A_BOLD); }
+                    }
+                     }
+        // "Butchery" button
+        if (i == 40) { 
+                    for (int v = 0; v < 15; v++)
+                    {
+                       int u = v-2;
+                       if (v <= 12) { mvwaddch(mainWindow[3], 0, v, topic1Btn[0][v] | COLOR_PAIR(40) | A_BOLD); }
+                       mvwaddch(mainWindow[3], 1, v, topic1Btn[2][v] | COLOR_PAIR(40) | A_BOLD);
+                       if (v >= 2) { mvwaddch(mainWindow[3], 2, v, topic1Btn[3][u] | COLOR_PAIR(40) | A_BOLD); }
+                    }
+                     }
+        // "Cities of Canada" button
+        if (i == 50) { 
+                    for (int v = 0; v < 15; v++)
+                    {
+                       int u = v-2;
+                       if (v <= 12) { mvwaddch(mainWindow[4], 0, v, topic2Btn[0][v] | COLOR_PAIR(40) | A_BOLD); }
+                       mvwaddch(mainWindow[4], 1, v, topic2Btn[2][v] | COLOR_PAIR(40) | A_BOLD);
+                       if (v >= 2) { mvwaddch(mainWindow[4], 2, v, topic2Btn[3][u] | COLOR_PAIR(40) | A_BOLD); }
+                    }
+                     }
+        // "Social Media Platforms" button
+        if (i == 60) { 
+                    for (int v = 0; v < 15; v++)
+                    {
+                       int u = v-2;
+                       if (v <= 12) { mvwaddch(mainWindow[5], 0, v, topic3Btn[0][v] | COLOR_PAIR(40) | A_BOLD); }
+                       mvwaddch(mainWindow[5], 1, v, topic3Btn[2][v] | COLOR_PAIR(40) | A_BOLD);
+                       if (v >= 2) { mvwaddch(mainWindow[5], 2, v, topic3Btn[3][u] | COLOR_PAIR(40) | A_BOLD); }
+                    }
+                     }
+        // "Elements" button
+        if (i == 70) { 
+                    for (int v = 0; v < 15; v++)
+                    {
+                       int u = v-2;
+                       if (v <= 12) { mvwaddch(mainWindow[6], 0, v, topic4Btn[0][v] | COLOR_PAIR(40) | A_BOLD); }
+                       mvwaddch(mainWindow[6], 1, v, topic4Btn[2][v] | COLOR_PAIR(40) | A_BOLD);
+                       if (v >= 2) { mvwaddch(mainWindow[6], 2, v, topic4Btn[3][u] | COLOR_PAIR(40) | A_BOLD); }
+                    }
+                     }
+        // "Web Browsers" button
+        if (i == 80) { 
+                    for (int v = 0; v < 15; v++)
+                    {
+                       int u = v-2;
+                       if (v <= 12) { mvwaddch(mainWindow[7], 0, v, topic5Btn[0][v] | COLOR_PAIR(40) | A_BOLD); }
+                       mvwaddch(mainWindow[7], 1, v, topic5Btn[2][v] | COLOR_PAIR(40) | A_BOLD);
+                       if (v >= 2) { mvwaddch(mainWindow[7], 2, v, topic5Btn[3][u] | COLOR_PAIR(40) | A_BOLD); }
+                    }
+                     }
+
+
+
+        update_panels();
+        doupdate();
+        msleep(25);
+    }
+    
+    
+    // The menu keybinds and logic for responsive UI
+    int isInputBlocked, ch, selectorX = 1, selectorY = 1, selector = 1;
+    isInputBlocked = IsInputBlocked();
+    mvwprintw(mainWindow[8], 0, 20, "     Choose at random.. Spooky!     ");
+    update_panels(); doupdate();
+    while((ch = getch()) != KEY_F(13)) // F13 is a nonstandard key
+    {
+        
+        msleep(25);
+
+        isInputBlocked = IsInputBlocked();
+        if (isInputBlocked == 0)
+        {
+            mvprintw(maxY-1, 0, "[main/DEBUG]: lastkeypress: %u  \n", ch);
+            switch (ch) {
+                case KEY_UP:
+                // Move upwards
+                selectorY--;
+                if (selectorY < 1) { selectorY = 3; }
+                mvprintw(maxY-2, 0, "[main/DEBUG]: selector is: (%d, %d)  ", selectorX, selectorY);
+                break;
+                case KEY_LEFT:
+                // Move left
+                selectorX--;
+                if (selectorX < 1) { selectorX = 2; }
+                mvprintw(maxY-2, 0, "[main/DEBUG]: selector is: (%d, %d)  ", selectorX, selectorY);
+                break;
+                case KEY_DOWN:
+                // Move downwards
+                selectorY++;
+                if (selectorY > 3) { selectorY = 1; }
+                mvprintw(maxY-2, 0, "[main/DEBUG]: selector is: (%d, %d)  ", selectorX, selectorY);
+                break;
+                case KEY_RIGHT:
+                // Move left
+                selectorX++;
+                if (selectorX > 2) { selectorX = 1; }
+                mvprintw(maxY-2, 0, "[main/DEBUG]: selector is: (%d, %d)  ", selectorX, selectorY);
+                break;
+                case KEY_F(1):
+                    endwin();
+                    exit(0);
+                case 10: // ASCII code of newline
+                case 13: // ASCII code of carriage return (kinda like a newline)
+                switch(selectorX)
+                {
+                    case 1:
+                        // first row of buttons
+                        switch(selectorY)
+                        {
+                            case 1:
+                            break;
+                            case 2:
+                            break;
+                            case 3:
+                            break;
+                            default:
+                            break;
+                        }
+                    case 2:
+                        // second row of buttons
+                        switch(selectorY)
+                        {
+                            case 1:
+                            break;
+                            case 2:
+                            break;
+                            case 3:
+                            break;
+                            default:
+                            break;
+                        }
+                    case 3:
+                        // call a quit function, for now we will just endwin()
+                        endwin();
+                        exit(0);
+                }
+               default:
+                    break;
+            }
+        }
+
+        // Refresh the buttons to show which one is selected
+        if (selectorX == 1 && selectorY == 1)
+        {
+            for (int v = 0; v < 15; v++)
+            {
+                mvwprintw(mainWindow[8], 0, 20, "     Choose at random.. Spooky!     ");
+                mvwaddch(mainWindow[2], 1, v, randTopicBtn[1][v] | COLOR_PAIR(40) | A_BOLD);
+                mvwaddch(mainWindow[3], 1, v, topic1Btn[2][v] | COLOR_PAIR(40) | A_BOLD);
+                mvwaddch(mainWindow[4], 1, v, topic2Btn[2][v] | COLOR_PAIR(40) | A_BOLD);
+                mvwaddch(mainWindow[5], 1, v, topic3Btn[2][v] | COLOR_PAIR(40) | A_BOLD);
+                mvwaddch(mainWindow[6], 1, v, topic4Btn[2][v] | COLOR_PAIR(40) | A_BOLD);
+                mvwaddch(mainWindow[7], 1, v, topic5Btn[2][v] | COLOR_PAIR(40) | A_BOLD);
+            }
+        } else if (selectorX == 1 && selectorY == 2)
+        {
+            for (int v = 0; v < 15; v++)
+            {
+                mvwprintw(mainWindow[8], 0, 20, "    Select \"Meats and butchers\"?    ");
+                mvwaddch(mainWindow[2], 1, v, randTopicBtn[2][v] | COLOR_PAIR(40) | A_BOLD);
+                mvwaddch(mainWindow[3], 1, v, topic1Btn[1][v] | COLOR_PAIR(40) | A_BOLD);
+                mvwaddch(mainWindow[4], 1, v, topic2Btn[2][v] | COLOR_PAIR(40) | A_BOLD);
+                mvwaddch(mainWindow[5], 1, v, topic3Btn[2][v] | COLOR_PAIR(40) | A_BOLD);
+                mvwaddch(mainWindow[6], 1, v, topic4Btn[2][v] | COLOR_PAIR(40) | A_BOLD);
+                mvwaddch(mainWindow[7], 1, v, topic5Btn[2][v] | COLOR_PAIR(40) | A_BOLD);
+            }
+        } else if (selectorX == 1 && selectorY == 3)
+        {
+            for (int v = 0; v < 15; v++)
+            {
+                mvwprintw(mainWindow[8], 0, 20, "     Select \"Cities of Canada\"?     ");
+                mvwaddch(mainWindow[2], 1, v, randTopicBtn[2][v] | COLOR_PAIR(40) | A_BOLD);
+                mvwaddch(mainWindow[3], 1, v, topic1Btn[2][v] | COLOR_PAIR(40) | A_BOLD);
+                mvwaddch(mainWindow[4], 1, v, topic2Btn[1][v] | COLOR_PAIR(40) | A_BOLD);
+                mvwaddch(mainWindow[5], 1, v, topic3Btn[2][v] | COLOR_PAIR(40) | A_BOLD);
+                mvwaddch(mainWindow[6], 1, v, topic4Btn[2][v] | COLOR_PAIR(40) | A_BOLD);
+                mvwaddch(mainWindow[7], 1, v, topic5Btn[2][v] | COLOR_PAIR(40) | A_BOLD);
+            }
+        } else if (selectorX == 2 && selectorY == 1)
+        {
+            for (int v = 0; v < 15; v++)
+            {
+                mvwprintw(mainWindow[8], 0, 20, "  Select \"Social Media Platforms\"?  ");
+                mvwaddch(mainWindow[2], 1, v, randTopicBtn[2][v] | COLOR_PAIR(40) | A_BOLD);
+                mvwaddch(mainWindow[3], 1, v, topic1Btn[2][v] | COLOR_PAIR(40) | A_BOLD);
+                mvwaddch(mainWindow[4], 1, v, topic2Btn[2][v] | COLOR_PAIR(40) | A_BOLD);
+                mvwaddch(mainWindow[5], 1, v, topic3Btn[1][v] | COLOR_PAIR(40) | A_BOLD);
+                mvwaddch(mainWindow[6], 1, v, topic4Btn[2][v] | COLOR_PAIR(40) | A_BOLD);
+                mvwaddch(mainWindow[7], 1, v, topic5Btn[2][v] | COLOR_PAIR(40) | A_BOLD);
+            }
+        } else if (selectorX == 2 && selectorY == 2)
+        {
+            for (int v = 0; v < 15; v++)
+            {
+                mvwprintw(mainWindow[8], 0, 20, "         Select \"Elements\"?         ");
+                mvwaddch(mainWindow[2], 1, v, randTopicBtn[2][v] | COLOR_PAIR(40) | A_BOLD);
+                mvwaddch(mainWindow[3], 1, v, topic1Btn[2][v] | COLOR_PAIR(40) | A_BOLD);
+                mvwaddch(mainWindow[4], 1, v, topic2Btn[2][v] | COLOR_PAIR(40) | A_BOLD);
+                mvwaddch(mainWindow[5], 1, v, topic3Btn[2][v] | COLOR_PAIR(40) | A_BOLD);
+                mvwaddch(mainWindow[6], 1, v, topic4Btn[1][v] | COLOR_PAIR(40) | A_BOLD);
+                mvwaddch(mainWindow[7], 1, v, topic5Btn[2][v] | COLOR_PAIR(40) | A_BOLD);
+            }
+        } else if (selectorX == 2 && selectorY == 3)
+        {
+            for (int v = 0; v < 15; v++)
+            {
+                mvwprintw(mainWindow[8], 0, 20, "       Select  \"Web Browser\"?       ");
+                mvwaddch(mainWindow[2], 1, v, randTopicBtn[2][v] | COLOR_PAIR(40) | A_BOLD);
+                mvwaddch(mainWindow[3], 1, v, topic1Btn[2][v] | COLOR_PAIR(40) | A_BOLD);
+                mvwaddch(mainWindow[4], 1, v, topic2Btn[2][v] | COLOR_PAIR(40) | A_BOLD);
+                mvwaddch(mainWindow[5], 1, v, topic3Btn[2][v] | COLOR_PAIR(40) | A_BOLD);
+                mvwaddch(mainWindow[6], 1, v, topic4Btn[2][v] | COLOR_PAIR(40) | A_BOLD);
+                mvwaddch(mainWindow[7], 1, v, topic5Btn[1][v] | COLOR_PAIR(40) | A_BOLD);
+            }
+        }
+        update_panels();
+        doupdate();
+    }
+}
+
+
+
 
 // SIGWINCH handler for dynamic screen resize
 void UpdateScreen(int sig) {
