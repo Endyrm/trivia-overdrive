@@ -8,6 +8,9 @@
 WINDOW *mainWindow[10];
 PANEL *mainPanel[10];
 
+WINDOW *sessionWindow[10];
+PANEL *sessionPanel[10];
+
 // function prototypes for general window manipulation
 WINDOW *CreateNewWin(int height, int width, int startY, int startX);
 WINDOW *CreateNewWinBoxed(int height, int width, int startY, int startX);
@@ -17,6 +20,10 @@ void DestroyWin(WINDOW *localWindow);
 void VerifyMinimumScreenSize();
 int IsInputBlocked();
 void ShowLicense();
+void IntroSequence();
+void MainMenu();
+void StartGameTopicSelect();
+void StartGameSession(int topic);
 
 int maxY, maxX;
 
@@ -171,8 +178,8 @@ void MainMenu(int isFirstRun)
     char optionsBtn[4][15] =
     {
         { "             " },
-        { " -> OPTIONS <- " },
-        { "    OPTIONS    " },
+        { " -> LICENSE <- " },
+        { "    LICENSE    " },
         { "             " }
     };
     char exitBtn[4][15] =
@@ -308,14 +315,14 @@ void MainMenu(int isFirstRun)
                         StartGameTopicSelect();
                         break;
                     case 2:
-                        // call options menu, temp junk for now
+                        // call license menu after removing main menu windows
                         del_panel(mainPanel[1]); DestroyWin(mainWindow[1]);
                         del_panel(mainPanel[2]); DestroyWin(mainWindow[2]);
                         del_panel(mainPanel[3]); DestroyWin(mainWindow[3]);
                         del_panel(mainPanel[4]); DestroyWin(mainWindow[4]);
                         del_panel(mainPanel[5]); DestroyWin(mainWindow[5]);
-                        update_panels();
-                        doupdate();
+                        update_panels(); doupdate();
+
                         ShowLicense();
                         MainMenu(0);
                         break;
@@ -363,7 +370,7 @@ void MainMenu(int isFirstRun)
 
 void StartGameTopicSelect()
 {
-    // Flash the screen as we show the topic
+    // Flash the screen as we show the topic selector
     for (int i = 24; i > 0; i--)
     {
         int d = i;
@@ -402,7 +409,7 @@ void StartGameTopicSelect()
     doupdate();
 
 
-
+    // Text graphics of all the window elements
     char menuTitle[7][72] = {
         { " ____       _           _                   _____           _        _  " },
         { "/ ___|  ___| | ___  ___| |_       __ _     |_   _|__  _ __ (_) ___  | | " },
@@ -603,6 +610,7 @@ void StartGameTopicSelect()
                             default:
                             break;
                         }
+                        break;
                     case 2:
                         // second row of buttons
                         switch(selectorY)
@@ -612,14 +620,15 @@ void StartGameTopicSelect()
                             case 2:
                             break;
                             case 3:
+                            refresh();
+                            StartGameSession(5);
                             break;
                             default:
                             break;
                         }
-                    case 3:
-                        // call a quit function, for now we will just endwin()
-                        endwin();
-                        exit(0);
+                        break;
+                    default:
+                    break;
                 }
                default:
                     break;
@@ -702,6 +711,138 @@ void StartGameTopicSelect()
         }
         update_panels();
         doupdate();
+    }
+}
+
+void StartGameSession(int topic) {
+    // Immediately check which topic we are to select
+    switch(topic)
+    {
+        case 0:
+        // Random option, in this case randomize the topic
+        srand(time(NULL));
+        int randomizedTopic = 1 + (rand() % 5); // number can only be between 1-5
+        SetTopic(randomizedTopic);
+        break;
+        case 1:
+        // Set the topic to Butchery questions
+        SetTopic(1);
+        break;
+        case 2:
+        // Set the topic to Cities of Canada questions
+        SetTopic(2);
+        break;
+        case 3:
+        // Set the topic to Social Media Platform questions
+        SetTopic(3);
+        break;
+        case 4:
+        // Set the topic to Elements of the earth questions
+        SetTopic(4);
+        break;
+        case 5:
+        // Set the topic to Web Browser questions
+        SetTopic(5);
+        break;
+        default:
+        // Exit the game if there is an invalid topic
+        endwin();
+        printf("[main/ERROR]: Invalid topic %d selected", topic);
+        exit(-1);
+    }
+    // Destroy the topic selector's windows
+    for (int i = 8; i >= 0; i--)
+    {
+        del_panel(mainPanel[i]); DestroyWin(mainWindow[i]);
+    }
+
+    // Create the session Window
+    sessionWindow[0] = CreateNewWinBoxed(30, 80, (maxY / 2) - 15, (maxX - 80) / 2);
+    sessionPanel[0] = new_panel(sessionWindow[0]);
+
+    // Flash the screen as we show the topic chosen and start the game
+    for (int i = 24; i > 0; i--)
+    {
+        int d = i;
+        if (i == 0) { d = 38; }
+        wbkgd(sessionWindow[0], COLOR_PAIR(d));
+        update_panels(); doupdate();
+    
+        // Calculate a smooth flash
+        int ms = 50;
+        if (i == 0) {ms = 5; }
+        msleep(ms);
+    }
+    wbkgd(sessionWindow[0], COLOR_PAIR(38));
+    update_panels(); doupdate();
+
+    // wait and then show a window with the selected topic
+    msleep(1000);
+    sessionWindow[9] = CreateNewWinBoxed(5, 30, (maxY / 2) - 2, (maxX - 30) / 2);
+    sessionPanel[9] = new_panel(sessionWindow[9]);
+    mvwprintw(sessionWindow[9], 2, 9, "CHOSEN TOPIC");
+    PlayAudio("./audio/tack.wav");
+    update_panels(); doupdate();
+
+    // wait in suspense and then show the selected topic
+    msleep(1000);
+    switch(topic)
+    {
+        case 0: mvwprintw(sessionWindow[9], 2, 4, "RANDOM: One of 5 topics!"); break;
+        case 1: mvwprintw(sessionWindow[9], 2, 2, "BUTCHERY: meats and animals!"); break;
+        case 2: mvwprintw(sessionWindow[9], 2, 7, "CITIES OF CANADA"); break;
+        case 3: mvwprintw(sessionWindow[9], 2, 5, "SOCIAL MEDIA PLATFORMS"); break;
+        case 4: mvwprintw(sessionWindow[9], 2, 5, "ELEMENTS OF THE EARTH!"); break;
+        case 5: mvwprintw(sessionWindow[9], 2, 9, "WEB BROWSERS"); break;
+    }
+    PlayAudio("./audio/tack.wav");
+    update_panels(); doupdate();
+
+    // Then flash the screen again and start the questions session
+    msleep(2000);
+    getch();
+    del_panel(sessionPanel[9]); DestroyWin(sessionWindow[9]);
+    for (int i = 24; i > 0; i--)
+    {
+        int d = i;
+        if (i == 0) { d = 38; }
+        wbkgd(sessionWindow[0], COLOR_PAIR(d));
+        update_panels(); doupdate();
+    
+        // Calculate a smooth flash
+        int ms = 50;
+        if (i == 0) {ms = 5; }
+        msleep(ms);
+    }
+    wbkgd(sessionWindow[0], COLOR_PAIR(38));
+
+    // The questions loop begins here
+    for (int i = 0; i < 15; i++)
+    {
+        // Create necessary windows for the question
+        sessionWindow[1] = CreateNewWin(7,  72, (maxY / 2) - 14, (maxX - 72) / 2); // title
+        sessionWindow[2] = CreateNewWinBoxed(16, 76, (maxY / 2) - 2, (maxX - 76) / 2); // questions container
+        sessionWindow[3] = CreateNewWin(2, 74, (maxY / 2) - 1, (maxX - 74) / 2); // question container
+        sessionWindow[4] = CreateNewWin(1, 1, 1, 1); // answer (1) container
+        sessionWindow[5] = CreateNewWin(1, 1, 1, 1); // answer (1) container
+        sessionWindow[6] = CreateNewWin(1, 1, 1, 1); // answer (1) container
+        sessionWindow[7] = CreateNewWin(1, 1, 1, 1); // answer (1) container
+        sessionWindow[8] = CreateNewWinBoxed(3, 8, (maxY / 2) - 2, (maxX + 60) / 2); // Score counter
+        sessionWindow[9] = CreateNewWinBoxed(3, 13, (maxY / 2) - 3, (maxX - 12) / 2);
+        sessionPanel[1] = new_panel(sessionWindow[1]);
+        sessionPanel[2] = new_panel(sessionWindow[2]);
+        sessionPanel[3] = new_panel(sessionWindow[3]);
+        sessionPanel[4] = new_panel(sessionWindow[4]);
+        sessionPanel[5] = new_panel(sessionWindow[5]);
+        sessionPanel[6] = new_panel(sessionWindow[6]);
+        sessionPanel[7] = new_panel(sessionWindow[7]);
+        sessionPanel[8] = new_panel(sessionWindow[8]);
+        sessionPanel[9] = new_panel(sessionWindow[9]);
+        for (int i = 1; i <= 9; i++) { wbkgd(sessionWindow[i], COLOR_PAIR(38)); }
+        mvwprintw(sessionWindow[9], 1, 1, "QUESTION %d", i+1);
+        update_panels(); doupdate();
+        PlayAudio("./audio/tack.wav");
+        getch();
     }
 }
 
