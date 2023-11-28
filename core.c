@@ -182,7 +182,7 @@ char elementAnswers[][200] =
 
 
 // Web Browsers questions
-char webBrowserQuestions[][200] =
+char webBrowserQuestions[15][200] =
 {
     { "What was Mozilla Firefox's initial release name?                                                    Firefox                  Netscape                 Phoenix                  Lynx                     " },
     { "Which of the following is a command-line Web Browser?                                               Internet Explorer        Lynx                     Camino                   Chromium                 " },
@@ -239,8 +239,21 @@ void Shuffle(char (*array1)[200], int *array2, int rows) {
     for (int i = rows - 1; i > 0; i--) {
         int j = rand() % (i + 1);
 
-        SwapChar(array1, i, j);
-        SwapInt(array2, i, j);
+
+        int k = 0;
+        while (array1[i][k] != '\0' && array1[j][k] != '\0') {
+        char temp = array1[i][k];
+        array1[i][k] = array1[j][k];
+        array1[j][k] = temp;
+        k++;
+        }
+
+        int temp1 = array2[i];
+        array2[i] = array2[j];
+        array2[j] = temp1;
+
+        //SwapChar(array1, i, j);
+        //SwapInt(array2, i, j);
     }
 }
 
