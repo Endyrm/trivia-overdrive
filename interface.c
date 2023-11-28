@@ -85,8 +85,7 @@ void IntroSequence() {
     mvwprintw(mainWindow[1], 3, 3, "  \\ V  V /  __/ | (_| (_) | | | | | |  __/");
     mvwprintw(mainWindow[1], 4, 3, "   \\_/\\_/ \\___|_|\\___\\___/|_| |_| |_|\\___|");
     // play a boom sound
-    update_panels();
-    doupdate();
+    update_panels(); doupdate();
     msleep(1000);
     wclear(mainWindow[1]);
 
@@ -96,8 +95,7 @@ void IntroSequence() {
     mvwprintw(mainWindow[1], 3, 18, "  | | (_) |");
     mvwprintw(mainWindow[1], 4, 18, "  |_|\\___/ ");
     // play a boom sound
-    update_panels();
-    doupdate();
+    update_panels(); doupdate();
     msleep(1000);
     del_panel(mainPanel[1]);
     DestroyWin(mainWindow[1]);
@@ -817,7 +815,7 @@ void StartGameSession(int topic) {
     wbkgd(sessionWindow[0], COLOR_PAIR(38));
 
     // Set the score counter
-    int sessionScore = 0, currentSessionAnswer;
+    int sessionScore = 0;
     // The questions loop begins here
     for (int i = 0; i < 15; i++)
     {
@@ -845,8 +843,9 @@ void StartGameSession(int topic) {
         msleep(10);
         // Set the current question and answer
         char *currentSessionQuestion =   sessionQuestions[i];
-        currentSessionAnswer = sessionCorrectAnswer[i];
+        char currentSessionAnswer = sessionQuestions[i][200];
 
+        
         // Strings of the title text, ascii art strings
         char titleText_row0[72] = " _____     _       _          ___                    _      _           ";
         char titleText_row1[72] = "|_   _| __(_)_   _(_) __ _   / _ \\__   _____ _ __ __| |_ __(_)_   _____ ";
@@ -857,18 +856,21 @@ void StartGameSession(int topic) {
 
 
         // display title, copied and modified from main menu due to lack of time
-        for (int l = 0; l < 72; l++) { mvwaddch(mainWindow[1], 0, l, titleText_row0[l] | A_BOLD | COLOR_PAIR(39) ); }
-        for (int l = 0; l < 72; l++) { mvwaddch(mainWindow[1], 1, l, titleText_row1[l] | A_BOLD | COLOR_PAIR(39) ); }
-        for (int l = 0; l < 72; l++) { mvwaddch(mainWindow[1], 2, l, titleText_row2[l] | A_BOLD | COLOR_PAIR(39) ); }
-        for (int l = 0; l < 72; l++) { mvwaddch(mainWindow[1], 3, l, titleText_row3[l] | A_BOLD | COLOR_PAIR(39) ); }
-        for (int l = 0; l < 72; l++) { mvwaddch(mainWindow[1], 4, l, titleText_row4[l] | A_BOLD | COLOR_PAIR(39) ); }
-        for (int l = 0; l < 72; l++) { mvwaddch(mainWindow[1], 6, l, titleText_row6[l] | A_BOLD | COLOR_PAIR(39) ); }
+        for (int l = 0; l < 72; l++) { mvwaddch(sessionWindow[1], 0, l, titleText_row0[l] | A_BOLD | COLOR_PAIR(39) ); }
+        for (int l = 0; l < 72; l++) { mvwaddch(sessionWindow[1], 1, l, titleText_row1[l] | A_BOLD | COLOR_PAIR(39) ); }
+        for (int l = 0; l < 72; l++) { mvwaddch(sessionWindow[1], 2, l, titleText_row2[l] | A_BOLD | COLOR_PAIR(39) ); }
+        for (int l = 0; l < 72; l++) { mvwaddch(sessionWindow[1], 3, l, titleText_row3[l] | A_BOLD | COLOR_PAIR(39) ); }
+        for (int l = 0; l < 72; l++) { mvwaddch(sessionWindow[1], 4, l, titleText_row4[l] | A_BOLD | COLOR_PAIR(39) ); }
+        for (int l = 0; l < 72; l++) { mvwaddch(sessionWindow[1], 6, l, titleText_row6[l] | A_BOLD | COLOR_PAIR(39) ); }
+        
+        
         // Show the question number, show score
         mvwprintw(sessionWindow[9], 1, 1, "QUESTION %d", i+1);
         mvwprintw(sessionWindow[8], 1, 2, "%d/15", sessionScore);
-        playTackSound(); update_panels(); doupdate();
+        /*playTackSound();*/ update_panels(); doupdate();
         msleep(50);
 
+       
         // Show the question in the question container 
         
         // Allocate space for the extracted question
@@ -900,59 +902,113 @@ void StartGameSession(int topic) {
 
         update_panels(); doupdate();
 
-        // The menu keybinds and logic for responsive UI
-        int isInputBlocked, ch, selector = 1;
+        // The menu keybinds and logic for the inputs
+        int isInputBlocked, ch = 0, selector = 1;
         isInputBlocked = IsInputBlocked();
         int loopCheck = 0;
-        do 
+        while((ch = getch()) != KEY_F(13) && loopCheck != 1)
         {
-        
             msleep(25);
 
             isInputBlocked = IsInputBlocked();
             if (isInputBlocked == 0)
             {
-                mvprintw(maxY-1, 0, "[main/DEBUG]: lastkeypress: %u  \n", ch);
-                switch (ch) {
-                case '1':
-                case '2':
-                case '3':
-                case '4':
                 sessionAnswers[i] = ch;
-                mvprintw(10, 0, "sessionAnswers = %d, ch = %d", sessionAnswers[i], ch);
+                
+                switch (ch) {
+                case 49:        // numerical code for '1'
                 loopCheck = 1;
                 break;
-                case KEY_F(1):
+                case 50:        // numerical code for '2'
+                loopCheck = 1;
+                break;
+                case 51:        // numerical code for '3'
+                loopCheck = 1;
+                break;
+                case 52:        // numerical code for '4'
+                loopCheck = 1;
+                break;
+                case KEY_F(1): // F1 key to exit immediately
                     endwin();
                     exit(0);
                 
-                default:
+                default:    // ignore all other input
                     break;
                 }
             }
-        } while((ch = getch()) != 49 && ch != 50 && ch != 51 && ch != 52);
 
+            // Check if one of the numerical inputs were used to break out of the loop
+            if (loopCheck == 1)
+            {
+                break;
+            }
+        }
+
+        // Remove the panels and then create the verdict window (for whether answer is correct or not)
         for (int l = 9; l > 0; l--) { del_panel(sessionPanel[l]); DestroyWin(sessionWindow[l]); }
-        mvprintw(2, 1, "DEBUG: exited getch loop");
-        msleep(1000);
         sessionWindow[1] = CreateNewWinBoxed(5, 30, (maxY / 2) - 2, (maxX - 30) / 2);
         sessionPanel[1] = new_panel(sessionWindow[1]);
-        if (sessionCorrectAnswer[i] == sessionAnswers[i])
+
+        // Show the user the box with a second of delay before the verdict is shown
+        mvwprintw(sessionWindow[1], 2, 7, "Your answer is..");
+        update_panels(); doupdate();
+        msleep(1000);
+
+        // If the answer is correct
+        if (sessionAnswers[i] == currentSessionAnswer)
         {
-            mvprintw(1, 1, "DEBUG: correct answer");
-            refresh();
-            mvwprintw(sessionWindow[1], 2, 11, "CORRECT!");
+            // Show the verdict
+            mvwprintw(sessionWindow[1], 2, 7, "    CORRECT!    ");
             playCorrectSound();
             update_panels(); doupdate();
+
+            // Flash the box
+            wbkgd(sessionWindow[1], COLOR_PAIR(24)); update_panels(); doupdate(); msleep(250);
+            wbkgd(sessionWindow[1], COLOR_PAIR(38)); update_panels(); doupdate(); msleep(250);
+            wbkgd(sessionWindow[1], COLOR_PAIR(24)); update_panels(); doupdate(); msleep(250);
+            wbkgd(sessionWindow[1], COLOR_PAIR(38)); update_panels(); doupdate(); msleep(250);
+
+            // Increase session score, wait a second, then remove the verdict window
             sessionScore++;
-            getch();
+            msleep(1000);
+            mvwprintw(sessionWindow[1], 2, 7, "                ");
+            del_panel(sessionPanel[1]); DestroyWin(sessionWindow[1]);
+            update_panels(); doupdate();
+        
+        // If the answer is incorrect
         } else if (sessionAnswers[i] != currentSessionAnswer)
         {
-            mvprintw(0, 0, "DEBUG: incorrect answer, sessionCorrectAnswer[i] = %d", sessionCorrectAnswer[i]);
-            refresh();
-            getch();
+            // Show the verdict
+            mvwprintw(sessionWindow[1], 2, 7, "    ..WRONG!    ");
+            playIncorrectSound();
+            update_panels(); doupdate();
+
+            // Flash the box
+            wbkgd(sessionWindow[1], COLOR_PAIR(24)); update_panels(); doupdate(); msleep(250);
+            wbkgd(sessionWindow[1], COLOR_PAIR(38)); update_panels(); doupdate(); msleep(250);
+            wbkgd(sessionWindow[1], COLOR_PAIR(24)); update_panels(); doupdate(); msleep(250);
+            wbkgd(sessionWindow[1], COLOR_PAIR(38)); update_panels(); doupdate(); msleep(250);
+            
+            // Wait a second, then remove the window
+            msleep(1000);
+            mvwprintw(sessionWindow[1], 2, 7, "                ");
+            del_panel(sessionPanel[1]); DestroyWin(sessionWindow[1]);
+            update_panels(); doupdate();
         }
+    // Repeat for each question, then move on to the next block below
     }
+
+
+    // Create necessary windows for the end game scenario
+        sessionWindow[1] = CreateNewWin(7,  72, (maxY / 2) - 14, (maxX - 72) / 2); // title
+        sessionWindow[2] = CreateNewWin(8, 76, (maxY / 2) - 0, (maxX - 76) / 2); // Answers container
+        sessionWindow[3] = CreateNewWinBoxed(7, 30, (maxY / 2) - 3, (maxX - 30) / 2); // Verdict box
+        sessionPanel[1] = new_panel(sessionWindow[1]);
+        sessionPanel[2] = new_panel(sessionWindow[2]);
+        sessionPanel[3] = new_panel(sessionWindow[3]);
+
+        getch();
+
 }
 
 

@@ -64,4 +64,5 @@ void DefineColorPairs() {
     init_pair(39, 141, 232); // MediumPurple1 on hsl(0,0%,3%)
     init_pair(40, 141, 189); // MediumPurple1 on LightSteelBlue1
     init_pair(41, 244, 232); // hsl(0,0%,50%) on hsl(0,0%,3%)
+
 }
