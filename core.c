@@ -6,8 +6,8 @@
 
 // When the topic is chosen, the questions, user answers and correct answer are written to these
 char sessionQuestions[][200] = { { "" }, { "" }, { "" }, { "" }, { "" }, { "" }, { "" }, { "" }, { "" }, { "" }, { "" }, { "" }, { "" }, { "" }, { "" } };
-char sessionAnswers[][200] = { { "" }, { "" }, { "" }, { "" }, { "" }, { "" }, { "" }, { "" }, { "" }, { "" }, { "" }, { "" }, { "" }, { "" }, { "" } };
-char sessionCorrectAnswer[][200] = { { "" }, { "" }, { "" }, { "" }, { "" }, { "" }, { "" }, { "" }, { "" }, { "" }, { "" }, { "" }, { "" }, { "" }, { "" }, };
+int sessionAnswers[15] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+int sessionCorrectAnswer[15] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 
 // FORMAT for topicQuestions[][200]
@@ -37,6 +37,7 @@ char butcherQuestions[][200] =
     { "" }
 };
 
+// '1' = 49; '2' = 50; '3' = 51; '4' = 52
 char butcherAnswers[][200] =
 {
     { "1" },
@@ -77,6 +78,7 @@ char citiesOfCanadaQuestions[][200] =
     { "" }
 };
 
+// '1' = 49; '2' = 50; '3' = 51; '4' = 52
 char citiesOfCanadaAnswers[][200] =
 {
     { "" },
@@ -117,6 +119,7 @@ char socialMediaPlatformQuestions[][200] =
     { "" }
 };
 
+// '1' = 49; '2' = 50; '3' = 51; '4' = 52
 char socialMediaPlatformAnswers[][200] =
 {
     { "" },
@@ -157,6 +160,7 @@ char elementQuestions[][200] =
     { "" }
 };
 
+// '1' = 49; '2' = 50; '3' = 51; '4' = 52
 char elementAnswers[][200] =
 {
     { "" },
@@ -182,7 +186,7 @@ char webBrowserQuestions[][200] =
 {
     { "What was Mozilla Firefox's initial release name?                                                    Firefox                  Netscape                 Phoenix                  Lynx                     " },
     { "Which of the following is a command-line Web Browser?                                               Internet Explorer        Lynx                     Camino                   Chromium                 " },
-    { "What is the market share of Chrome worldwide in 2023?                                               20%%                      63%%                      91%%                      49%%                      " },
+    { "What is the market share of Chrome worldwide in 2023?                                               20%                      63%                      91%                      49%                      " },
     { "In 2023, which of these Web browsers use the Gecko browser engine?                                  Chrome                   Edge                     Opera                    Firefox                  " },
     { "Which chromium-based browser is known for having an AI assistant integrated within it?              Brave                    Opera GX                 Edge                     Vivaldi                  " },
     { "Which of the following takes advantage of the onion network, commonly known as the dark web?        Tor Browser              Torch                    Yandex Browser           Chrome                   " },
@@ -197,24 +201,9 @@ char webBrowserQuestions[][200] =
     { "When was the Chromium Web Browser initially released?                                               September 2008           December 1996            September 2013           January 2001             " }
 };
 
-char webBrowserAnswers[][200] =
-{
-    { "3" },
-    { "2" },
-    { "2" },
-    { "4" },
-    { "3" },
-    { "1" },
-    { "3" },
-    { "1" },
-    { "4" },
-    { "2" },
-    { "1" },
-    { "2" },
-    { "3" },
-    { "3" },
-    { "1" }
-};
+// '1' = 49; '2' = 50; '3' = 51; '4' = 52
+int webBrowserAnswers[15] =
+{ 49, 50, 50, 52, 51, 49, 51, 49, 52, 50, 49, 50, 51, 51, 49};
 
 
 /*
@@ -227,7 +216,7 @@ void Swap(char (*array)[200], int i, int j) {
     strcpy(array[j], temp);
 }*/
 
-void Swap(char (*array)[200], int i, int j) {
+void SwapChar(char (*array)[200], int i, int j) {
     int k = 0;
     while (array[i][k] != '\0' && array[j][k] != '\0') {
         char temp = array[i][k];
@@ -237,29 +226,37 @@ void Swap(char (*array)[200], int i, int j) {
     }
 }
 
-// A function to shuffle a two-dimensional array and another array in the same way
-void Shuffle(char (*array1)[200], char (*array2)[200], int rows, int cols) {
-    // Initialize the random number generator
-    mvprintw(10, 0, "setting random seed.."); refresh();
-    srand(time(NULL));
-    
-    // Loop through the array from the last element to the second element
-    for (int i = rows - 1; i > 0; i--) {
-        mvprintw(11, 0, "picking random element"); refresh();
-        // Pick a random element from the remaining part of the array
-        int j = rand() % (i + 1);
-
-        // Swap the current element with the random element in both arrays
-        Swap(array1, i, j);
-        Swap(array2, i, j);
-      }
+void SwapInt(int *array, int i, int j) {
+    int temp = array[i];
+    array[i] = array[j];
+    array[j] = temp;
 }
 
-void CopyArray(char (*source)[200], char (*destination)[200], int rows) {
+// A function to shuffle a two-dimensional array and another array in the same way
+void Shuffle(char (*array1)[200], int *array2, int rows) {
+    srand(time(NULL));
+
+    for (int i = rows - 1; i > 0; i--) {
+        int j = rand() % (i + 1);
+
+        SwapChar(array1, i, j);
+        SwapInt(array2, i, j);
+    }
+}
+
+void CopyArrayChar(char (*source)[200], char (*destination)[200], int rows) {
     for (int i = 0; i < rows; i++) {
         strcpy(destination[i], source[i]);
     }
 }
+
+void CopyArrayInt(int (*source), int (*destination), int rows) {
+    for (int i = 0; i < rows; i++) {
+            destination[i] = source[i];
+    }
+}
+
+
 
 // Set the topic of the session trivia questions and answers
 void SetTopic(int topic) {
@@ -267,43 +264,31 @@ void SetTopic(int topic) {
     // Use one of the topic arrays to calculate rows and cols used by the shuffle function
     // Due to the nature of the way we have the topic questions set, we use the following as our rows & cols calculator
     int rows = sizeof(webBrowserAnswers) / sizeof(webBrowserAnswers[0]);
-    int cols = sizeof(webBrowserAnswers[0]) / sizeof(webBrowserAnswers[0][0]);
     // Then we send off the chosen topic to the session arrays
     switch(topic)
     {
         case 1:
-        CopyArray(butcherQuestions, sessionQuestions, rows);
-        CopyArray(butcherAnswers, sessionCorrectAnswer, rows);
+        CopyArrayChar(butcherQuestions, sessionQuestions, rows);
+        CopyArrayInt(butcherAnswers, sessionCorrectAnswer, rows);
         break;
         case 2:
-        CopyArray(citiesOfCanadaQuestions, sessionQuestions, rows);
-        CopyArray(citiesOfCanadaAnswers, sessionCorrectAnswer, rows);
+        CopyArrayChar(citiesOfCanadaQuestions, sessionQuestions, rows);
+        CopyArrayInt(citiesOfCanadaAnswers, sessionCorrectAnswer, rows);
         break;
         case 3:
-        CopyArray(socialMediaPlatformQuestions, sessionQuestions, rows);
-        CopyArray(socialMediaPlatformAnswers, sessionCorrectAnswer, rows);
+        CopyArrayChar(socialMediaPlatformQuestions, sessionQuestions, rows);
+        CopyArrayInt(socialMediaPlatformAnswers, sessionCorrectAnswer, rows);
         break;
         case 4:
-        CopyArray(elementQuestions, sessionQuestions, rows);
-        CopyArray(elementAnswers, sessionCorrectAnswer, rows);
+        CopyArrayChar(elementQuestions, sessionQuestions, rows);
+        CopyArrayInt(elementAnswers, sessionCorrectAnswer, rows);
         break;
         case 5:
-        refresh();
-        CopyArray(webBrowserQuestions, sessionQuestions, rows);
-        CopyArray(webBrowserAnswers, sessionCorrectAnswer, rows);
+        CopyArrayChar(webBrowserQuestions, sessionQuestions, rows);
+        CopyArrayInt(webBrowserAnswers, sessionCorrectAnswer, rows);
         break;
     }
 
-    refresh();
     // Then send it off to the shuffle function
-    Shuffle(sessionQuestions, sessionCorrectAnswer, rows, cols);
-    mvprintw(4, 1, "[main/DEBUG]: success with SetTopic()!");
-    refresh();
-}
-
-// A function to print a two-dimensional array of strings
-void print_array(char (*array)[200], int rows, int cols) {
-  for (int i = 0; i < rows; i++) {
-    printf("%s\n", array[i]);
-  }
+    Shuffle(sessionQuestions, sessionCorrectAnswer, rows);
 }

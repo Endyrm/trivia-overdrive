@@ -13,5 +13,6 @@ Due to the nature of online "royalty-free" sounds often being rips from other ga
 | `tack.wav` | Used when showing the questions and answers, this is preferably a keyboard press sound |
 | `correct.wav` | Used when the answer provided is correct |
 | `incorrect.wav` | Used when the answer provided is incorrect |
-| `gameWin.wav` | Used when the player wins the game with 66.67% correct answers or more |
+| `gameWin1.wav` `gameWin2.wav` | Used when the player wins the game with 66.67% correct answers or more |
 | `gameLoss.wav` | Used when the player loses the game with less than 66.67% correct answers |
+| `menuTune.wav` | Used when the main menu appears to make it a little more lively |

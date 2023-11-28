@@ -15,6 +15,7 @@ PANEL *sessionPanel[10];
 WINDOW *CreateNewWin(int height, int width, int startY, int startX);
 WINDOW *CreateNewWinBoxed(int height, int width, int startY, int startX);
 void DestroyWin(WINDOW *localWindow);
+void wraptxtw(WINDOW* localWindow, const char* input, int maxWidth);
 
 // Function prototypes for the interface
 void VerifyMinimumScreenSize();
@@ -336,7 +337,7 @@ void MainMenu(int isFirstRun)
             }
         }
 
-        // WIN32: do it again for good measure as stuff tends to get weird on the windows terminal
+        // refresh the buttons for responsiveness
         if (selector == 1)
         {
             for (int v = 0; v < 15; v++)
@@ -781,7 +782,7 @@ void StartGameSession(int topic) {
     sessionWindow[9] = CreateNewWinBoxed(5, 30, (maxY / 2) - 2, (maxX - 30) / 2);
     sessionPanel[9] = new_panel(sessionWindow[9]);
     mvwprintw(sessionWindow[9], 2, 9, "CHOSEN TOPIC");
-    PlayAudio("./audio/tack.wav");
+    playTackSound();
     update_panels(); doupdate();
 
     // wait in suspense and then show the selected topic
@@ -795,12 +796,11 @@ void StartGameSession(int topic) {
         case 4: mvwprintw(sessionWindow[9], 2, 5, "ELEMENTS OF THE EARTH!"); break;
         case 5: mvwprintw(sessionWindow[9], 2, 9, "WEB BROWSERS"); break;
     }
-    PlayAudio("./audio/tack.wav");
+    playTackSound();
     update_panels(); doupdate();
 
     // Then flash the screen again and start the questions session
     msleep(2000);
-    getch();
     del_panel(sessionPanel[9]); DestroyWin(sessionWindow[9]);
     for (int i = 24; i > 0; i--)
     {
@@ -816,19 +816,21 @@ void StartGameSession(int topic) {
     }
     wbkgd(sessionWindow[0], COLOR_PAIR(38));
 
+    // Set the score counter
+    int sessionScore = 0, currentSessionAnswer;
     // The questions loop begins here
     for (int i = 0; i < 15; i++)
     {
         // Create necessary windows for the question
         sessionWindow[1] = CreateNewWin(7,  72, (maxY / 2) - 14, (maxX - 72) / 2); // title
         sessionWindow[2] = CreateNewWinBoxed(16, 76, (maxY / 2) - 2, (maxX - 76) / 2); // questions container
-        sessionWindow[3] = CreateNewWin(2, 74, (maxY / 2) - 1, (maxX - 74) / 2); // question container
-        sessionWindow[4] = CreateNewWin(1, 1, 1, 1); // answer (1) container
-        sessionWindow[5] = CreateNewWin(1, 1, 1, 1); // answer (1) container
-        sessionWindow[6] = CreateNewWin(1, 1, 1, 1); // answer (1) container
-        sessionWindow[7] = CreateNewWin(1, 1, 1, 1); // answer (1) container
+        sessionWindow[3] = CreateNewWin(2, 72, (maxY / 2) + 1, (maxX - 72) / 2); // question container
+        sessionWindow[4] = CreateNewWin(1, 25, (maxY / 2) + 6, (maxX - 50) / 2); // answer (1) container
+        sessionWindow[5] = CreateNewWin(1, 25, (maxY / 2) + 10, (maxX - 50) / 2); // answer (1) container
+        sessionWindow[6] = CreateNewWin(1, 25, (maxY / 2) + 6, (maxX + 20) / 2); // answer (1) container
+        sessionWindow[7] = CreateNewWin(1, 25, (maxY / 2) + 10, (maxX + 20) / 2); // answer (1) container
         sessionWindow[8] = CreateNewWinBoxed(3, 8, (maxY / 2) - 2, (maxX + 60) / 2); // Score counter
-        sessionWindow[9] = CreateNewWinBoxed(3, 13, (maxY / 2) - 3, (maxX - 12) / 2);
+        sessionWindow[9] = CreateNewWinBoxed(3, 13, (maxY / 2) - 3, (maxX - 12) / 2); // question num container
         sessionPanel[1] = new_panel(sessionWindow[1]);
         sessionPanel[2] = new_panel(sessionWindow[2]);
         sessionPanel[3] = new_panel(sessionWindow[3]);
@@ -838,11 +840,118 @@ void StartGameSession(int topic) {
         sessionPanel[7] = new_panel(sessionWindow[7]);
         sessionPanel[8] = new_panel(sessionWindow[8]);
         sessionPanel[9] = new_panel(sessionWindow[9]);
-        for (int i = 1; i <= 9; i++) { wbkgd(sessionWindow[i], COLOR_PAIR(38)); }
+        for (int d = 1; d <= 9; d++) { wbkgd(sessionWindow[d], COLOR_PAIR(38)); }
+
+        msleep(10);
+        // Set the current question and answer
+        char *currentSessionQuestion =   sessionQuestions[i];
+        currentSessionAnswer = sessionCorrectAnswer[i];
+
+        // Strings of the title text, ascii art strings
+        char titleText_row0[72] = " _____     _       _          ___                    _      _           ";
+        char titleText_row1[72] = "|_   _| __(_)_   _(_) __ _   / _ \\__   _____ _ __ __| |_ __(_)_   _____ ";
+        char titleText_row2[72] = "  | || '__| \\ \\ / / |/ _` | | | | \\ \\ / / _ \\ '__/ _` | '__| \\ \\ / / _ \\";
+        char titleText_row3[72] = "  | || |  | |\\ V /| | (_| | | |_| |\\ V /  __/ | | (_| | |  | |\\ V /  __/";
+        char titleText_row4[72] = "  |_||_|  |_| \\_/ |_|\\__,_|  \\___/  \\_/ \\___|_|  \\__,_|_|  |_| \\_/ \\___|";
+        char titleText_row6[72] = "             Test your knowledge up to the absolute limits!             ";
+
+
+        // display title, copied and modified from main menu due to lack of time
+        for (int l = 0; l < 72; l++) { mvwaddch(mainWindow[1], 0, l, titleText_row0[l] | A_BOLD | COLOR_PAIR(39) ); }
+        for (int l = 0; l < 72; l++) { mvwaddch(mainWindow[1], 1, l, titleText_row1[l] | A_BOLD | COLOR_PAIR(39) ); }
+        for (int l = 0; l < 72; l++) { mvwaddch(mainWindow[1], 2, l, titleText_row2[l] | A_BOLD | COLOR_PAIR(39) ); }
+        for (int l = 0; l < 72; l++) { mvwaddch(mainWindow[1], 3, l, titleText_row3[l] | A_BOLD | COLOR_PAIR(39) ); }
+        for (int l = 0; l < 72; l++) { mvwaddch(mainWindow[1], 4, l, titleText_row4[l] | A_BOLD | COLOR_PAIR(39) ); }
+        for (int l = 0; l < 72; l++) { mvwaddch(mainWindow[1], 6, l, titleText_row6[l] | A_BOLD | COLOR_PAIR(39) ); }
+        // Show the question number, show score
         mvwprintw(sessionWindow[9], 1, 1, "QUESTION %d", i+1);
+        mvwprintw(sessionWindow[8], 1, 2, "%d/15", sessionScore);
+        playTackSound(); update_panels(); doupdate();
+        msleep(50);
+
+        // Show the question in the question container 
+        
+        // Allocate space for the extracted question
+        char* wrappedSessionQuestion = (char*)malloc(101);
+        if (wrappedSessionQuestion) {
+            // copy the specified string and then place it in the const char* for use with wraptxtw()
+            strncpy(wrappedSessionQuestion, currentSessionQuestion, 100);
+            wrappedSessionQuestion[100] = '\0';
+            const char* displayedSessionQuestion = wrappedSessionQuestion;
+
+            // display wrapped question text
+            wraptxtw(sessionWindow[3], displayedSessionQuestion, 72);
+
+            // Free allocated memory
+            free(wrappedSessionQuestion);
+
+        } else {
+            endwin();
+            printf("[main/ERROR]: Memory allocation failure.\n");
+            exit(-1);
+        }
+
+        // Show all possible answers
+        for (int u = 0; u < 4;  u++) { mvwprintw(sessionWindow[u+4], 0, 0, "(%d) ", u+1); }
+        for (int v = 0; v < 25; v++) { mvwaddch(sessionWindow[4], 0, 4 + v, sessionQuestions[i][v+100]); }
+        for (int v = 0; v < 25; v++) { mvwaddch(sessionWindow[5], 0, 4 + v, sessionQuestions[i][v+125]); }
+        for (int v = 0; v < 25; v++) { mvwaddch(sessionWindow[6], 0, 4 + v, sessionQuestions[i][v+150]); }
+        for (int v = 0; v < 25; v++) { mvwaddch(sessionWindow[7], 0, 4 + v, sessionQuestions[i][v+175]); }
+
         update_panels(); doupdate();
-        PlayAudio("./audio/tack.wav");
-        getch();
+
+        // The menu keybinds and logic for responsive UI
+        int isInputBlocked, ch, selector = 1;
+        isInputBlocked = IsInputBlocked();
+        int loopCheck = 0;
+        do 
+        {
+        
+            msleep(25);
+
+            isInputBlocked = IsInputBlocked();
+            if (isInputBlocked == 0)
+            {
+                mvprintw(maxY-1, 0, "[main/DEBUG]: lastkeypress: %u  \n", ch);
+                switch (ch) {
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                sessionAnswers[i] = ch;
+                mvprintw(10, 0, "sessionAnswers = %d, ch = %d", sessionAnswers[i], ch);
+                loopCheck = 1;
+                break;
+                case KEY_F(1):
+                    endwin();
+                    exit(0);
+                
+                default:
+                    break;
+                }
+            }
+        } while((ch = getch()) != 49 && ch != 50 && ch != 51 && ch != 52);
+
+        for (int l = 9; l > 0; l--) { del_panel(sessionPanel[l]); DestroyWin(sessionWindow[l]); }
+        mvprintw(2, 1, "DEBUG: exited getch loop");
+        msleep(1000);
+        sessionWindow[1] = CreateNewWinBoxed(5, 30, (maxY / 2) - 2, (maxX - 30) / 2);
+        sessionPanel[1] = new_panel(sessionWindow[1]);
+        if (sessionCorrectAnswer[i] == sessionAnswers[i])
+        {
+            mvprintw(1, 1, "DEBUG: correct answer");
+            refresh();
+            mvwprintw(sessionWindow[1], 2, 11, "CORRECT!");
+            playCorrectSound();
+            update_panels(); doupdate();
+            sessionScore++;
+            getch();
+        } else if (sessionAnswers[i] != currentSessionAnswer)
+        {
+            mvprintw(0, 0, "DEBUG: incorrect answer, sessionCorrectAnswer[i] = %d", sessionCorrectAnswer[i]);
+            refresh();
+            getch();
+        }
     }
 }
 
@@ -953,6 +1062,32 @@ void ShowLicense() {
     getch();
     DestroyWin(licenseWindow);
     clear();
+}
+
+// Print text wrapped cleanly
+void wraptxtw(WINDOW* win, const char* input, int maxWidth) {
+    char* copy = strdup(input); // Create a copy to avoid modifying the original
+    char* word = strtok(copy, " ");
+    char line[200] = ""; // Initialize an empty line buffer
+
+    while (word != NULL) {
+        if (strlen(line) + strlen(word) + 1 <= maxWidth) {
+            // Word fits within the line length limit
+            strcat(line, word);
+            strcat(line, " ");
+        } else {
+            // Start a new line
+            mvwprintw(win, 0, 1, "%s", line); // Print the line in the specified window
+            strcpy(line, word);
+            strcat(line, " ");
+        }
+        word = strtok(NULL, " ");
+    }
+
+    // Print the last line
+    mvwprintw(win, 1, 1, "%s", line);
+
+    free(copy); // Clean up
 }
 
 

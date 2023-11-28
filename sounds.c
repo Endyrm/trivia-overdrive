@@ -18,7 +18,7 @@
 
 // Function prototypes
 void PlayAudio(char *fileName);
-void ForkAndDetatch(char *fileName);
+void ForkAndDetach(char *fileName);
 
 // Function Macro prototypes
 void playThudSound();       // Used in intro sequence
@@ -70,8 +70,8 @@ void ForkAndDetach(char *fileName)
 // it simplifies stuff by letting me config them directly here
 // and calling them wherever I want in code.
 
+// More information is found on each audio file in audio/README.md
 
-// these are placeholders for now
 void playThudSound() {
     ForkAndDetach("./audio/thud.wav");
 }
@@ -80,4 +80,34 @@ void playRevealSound() {
     ForkAndDetach("./audio/reveal.wav");
 }
 
+void playPromptSound() {
+    ForkAndDetach("./audio/prompt.wav");
+}
 
+void playNavSound() {
+    ForkAndDetach("./audio/nav.wav");
+}
+
+void playEnterSound() {
+    ForkAndDetach("./audio/ender.wav");
+}
+
+void playTackSound() {
+    ForkAndDetach("./audio/tack.wav");
+}
+
+void playCorrectSound() {
+    ForkAndDetach("./audio/correct.wav");
+}
+
+void playIncorrectSound() {
+    ForkAndDetach("./audio/correct.wav");
+}
+
+void playGameWinSound() {
+    ForkAndDetach("./audio/gameWin.wav");
+}
+
+void playGameLossSound() {
+    ForkAndDetach("./audio/gameLoss.wav");
+}
