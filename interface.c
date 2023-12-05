@@ -84,7 +84,7 @@ void IntroSequence() {
     mvwprintw(mainWindow[1], 2, 3, " \\ \\ /\\ / / _ \\ |/ __/ _ \\| '_ ` _ \\ / _ \\");
     mvwprintw(mainWindow[1], 3, 3, "  \\ V  V /  __/ | (_| (_) | | | | | |  __/");
     mvwprintw(mainWindow[1], 4, 3, "   \\_/\\_/ \\___|_|\\___\\___/|_| |_| |_|\\___|");
-    // play a boom sound
+    playThudSound();
     update_panels(); doupdate();
     msleep(1000);
     wclear(mainWindow[1]);
@@ -94,7 +94,7 @@ void IntroSequence() {
     mvwprintw(mainWindow[1], 2, 18, "  | |/ _ \\ ");
     mvwprintw(mainWindow[1], 3, 18, "  | | (_) |");
     mvwprintw(mainWindow[1], 4, 18, "  |_|\\___/ ");
-    // play a boom sound
+    playThudSound();
     update_panels(); doupdate();
     msleep(1000);
     del_panel(mainPanel[1]);
@@ -102,9 +102,10 @@ void IntroSequence() {
 }
 
 // Main menu code
-void MainMenu(int isFirstRun)
+void MainMenu(int isFirstRun, int playIntroMusic)
 {
     if (isFirstRun == 1) {
+        playRevealSound();
         for (int i = 24; i > 0; i--)
         {
             int d = i;
@@ -118,6 +119,10 @@ void MainMenu(int isFirstRun)
             if (i == 0) {ms = 5; }
             msleep(ms);
         }
+    }
+    if (playIntroMusic == 1)
+    {
+        playMenuTune(); // run funny tune
     }
     wbkgd(mainWindow[0], COLOR_PAIR(38));
     update_panels();
@@ -279,27 +284,27 @@ void MainMenu(int isFirstRun)
         isInputBlocked = IsInputBlocked();
         if (isInputBlocked == 0)
         {
-            mvprintw(maxY-1, 0, "[main/DEBUG]: lastkeypress: %u  \n", ch);
             switch (ch) {
                 case KEY_UP:
                 case KEY_LEFT:
+                playNavSound();
                 // Make the selector move backwards
                 selector--;
                 if (selector < 1) { selector = 3; }
-                mvprintw(maxY-2, 0, "[main/DEBUG]: selector is: %d  ", selector);
                 break;
                 case KEY_DOWN:
                 case KEY_RIGHT:
+                playNavSound();
                 // Make the selector move forward
                 selector++;
                 if (selector > 3) { selector = 1; }
-                mvprintw(maxY-2, 0, "[main/DEBUG]: selector is: %d  ", selector);
                 break;
                 case KEY_F(1):
                     endwin();
                     exit(0);
                 case 10: // ASCII code of newline
                 case 13: // ASCII code of carriage return (kinda like a newline)
+                playEnterSound();
                 switch(selector)
                 {
                     case 1:
@@ -323,7 +328,7 @@ void MainMenu(int isFirstRun)
                         update_panels(); doupdate();
 
                         ShowLicense();
-                        MainMenu(0);
+                        MainMenu(0, 0);
                         break;
                     case 3:
                         // call a quit function, for now we will just endwin()
@@ -563,37 +568,37 @@ void StartGameTopicSelect()
         isInputBlocked = IsInputBlocked();
         if (isInputBlocked == 0)
         {
-            mvprintw(maxY-1, 0, "[main/DEBUG]: lastkeypress: %u  \n", ch);
             switch (ch) {
                 case KEY_UP:
+                playNavSound();
                 // Move upwards
                 selectorY--;
                 if (selectorY < 1) { selectorY = 3; }
-                mvprintw(maxY-2, 0, "[main/DEBUG]: selector is: (%d, %d)  ", selectorX, selectorY);
                 break;
                 case KEY_LEFT:
+                playNavSound();
                 // Move left
                 selectorX--;
                 if (selectorX < 1) { selectorX = 2; }
-                mvprintw(maxY-2, 0, "[main/DEBUG]: selector is: (%d, %d)  ", selectorX, selectorY);
                 break;
                 case KEY_DOWN:
+                playNavSound();
                 // Move downwards
                 selectorY++;
                 if (selectorY > 3) { selectorY = 1; }
-                mvprintw(maxY-2, 0, "[main/DEBUG]: selector is: (%d, %d)  ", selectorX, selectorY);
                 break;
                 case KEY_RIGHT:
+                playNavSound();
                 // Move left
                 selectorX++;
                 if (selectorX > 2) { selectorX = 1; }
-                mvprintw(maxY-2, 0, "[main/DEBUG]: selector is: (%d, %d)  ", selectorX, selectorY);
                 break;
                 case KEY_F(1):
                     endwin();
                     exit(0);
                 case 10: // ASCII code of newline
                 case 13: // ASCII code of carriage return (kinda like a newline)
+                playEnterSound();
                 switch(selectorX)
                 {
                     case 1:
@@ -601,10 +606,13 @@ void StartGameTopicSelect()
                         switch(selectorY)
                         {
                             case 1:
+                            StartGameSession(0);
                             break;
                             case 2:
+                            StartGameSession(1);
                             break;
                             case 3:
+                            StartGameSession(2);
                             break;
                             default:
                             break;
@@ -615,8 +623,10 @@ void StartGameTopicSelect()
                         switch(selectorY)
                         {
                             case 1:
+                            StartGameSession(3);
                             break;
                             case 2:
+                            StartGameSession(4);
                             break;
                             case 3:
                             refresh();
@@ -800,6 +810,7 @@ void StartGameSession(int topic) {
     // Then flash the screen again and start the questions session
     msleep(2000);
     del_panel(sessionPanel[9]); DestroyWin(sessionWindow[9]);
+    playRevealSound();
     for (int i = 24; i > 0; i--)
     {
         int d = i;
@@ -813,6 +824,10 @@ void StartGameSession(int topic) {
         msleep(ms);
     }
     wbkgd(sessionWindow[0], COLOR_PAIR(38));
+
+    mvwprintw(mainWindow[0], 29, 3, " (F1): Exit Now ");
+    mvwprintw(mainWindow[0], 29, 60, " (1) (2) (3) (3) ");
+    update_panels(); doupdate();
 
     // Set the score counter
     int sessionScore = 0;
@@ -867,7 +882,7 @@ void StartGameSession(int topic) {
         // Show the question number, show score
         mvwprintw(sessionWindow[9], 1, 1, "QUESTION %d", i+1);
         mvwprintw(sessionWindow[8], 1, 2, "%d/15", sessionScore);
-        /*playTackSound();*/ update_panels(); doupdate();
+        playTackSound(); update_panels(); doupdate();
         msleep(50);
 
        
@@ -917,15 +932,19 @@ void StartGameSession(int topic) {
                 
                 switch (ch) {
                 case 49:        // numerical code for '1'
+                playEnterSound();
                 loopCheck = 1;
                 break;
                 case 50:        // numerical code for '2'
+                playEnterSound();
                 loopCheck = 1;
                 break;
                 case 51:        // numerical code for '3'
+                playEnterSound();
                 loopCheck = 1;
                 break;
                 case 52:        // numerical code for '4'
+                playEnterSound();
                 loopCheck = 1;
                 break;
                 case KEY_F(1): // F1 key to exit immediately
@@ -1000,15 +1019,215 @@ void StartGameSession(int topic) {
 
 
     // Create necessary windows for the end game scenario
-        sessionWindow[1] = CreateNewWin(7,  72, (maxY / 2) - 14, (maxX - 72) / 2); // title
-        sessionWindow[2] = CreateNewWin(8, 76, (maxY / 2) - 0, (maxX - 76) / 2); // Answers container
-        sessionWindow[3] = CreateNewWinBoxed(7, 30, (maxY / 2) - 3, (maxX - 30) / 2); // Verdict box
+        sessionWindow[1] = CreateNewWin(7,  34, (maxY / 2) - 14, (maxX - 34) / 2); // title
+        sessionWindow[2] = CreateNewWin(8, 76, (maxY / 2) + 5, (maxX - 76) / 2); // Answers container
+        sessionWindow[3] = CreateNewWinBoxed(7, 30, (maxY / 2) - 6, (maxX - 30) / 2); // Verdict box
         sessionPanel[1] = new_panel(sessionWindow[1]);
         sessionPanel[2] = new_panel(sessionWindow[2]);
         sessionPanel[3] = new_panel(sessionWindow[3]);
+        for (int d = 1; d <= 3; d++) { wbkgd(sessionWindow[d], COLOR_PAIR(38)); }
 
-        getch();
 
+        char menuTitle[7][36] = {
+            { " ____                 _ _       _   " },
+            { "|  _ \\ ___  ___ _   _| | |_ ___| | " },
+            { "| |_) / _ \\/ __| | | | | __/ __| | " },
+            { "|  _ <  __/\\__ \\ |_| | | |_\\__ \\_| " },
+            { "|_| \\_\\___||___/\\__,_|_|\\__|___(_) " },
+            { "                                   " },
+            { "   Are you good with this topic?   " }
+        };
+
+        mvwprintw(mainWindow[0], 29, 58, "                   ");
+        // Reveal the window, one element at a time
+        for (int f = 0; f < 100; f++)
+        {
+            if (f >=  0 && f < 34) { mvwaddch(sessionWindow[1], 0, f,    menuTitle[0][f]    | A_BOLD | COLOR_PAIR(39) ); }
+            if (f >=  5 && f < 39) { mvwaddch(sessionWindow[1], 1, f-5,  menuTitle[1][f-5]  | A_BOLD | COLOR_PAIR(39) ); }
+            if (f >= 10 && f < 44) { mvwaddch(sessionWindow[1], 2, f-10, menuTitle[2][f-10] | A_BOLD | COLOR_PAIR(39) ); }
+            if (f >= 15 && f < 49) { mvwaddch(sessionWindow[1], 3, f-15, menuTitle[3][f-15] | A_BOLD | COLOR_PAIR(39) ); }
+            if (f >= 20 && f < 54) { mvwaddch(sessionWindow[1], 4, f-20, menuTitle[4][f-20] | A_BOLD | COLOR_PAIR(39) ); }
+            if (f >= 25 && f < 59) { mvwaddch(sessionWindow[1], 5, f-25, menuTitle[5][f-25] | A_BOLD | COLOR_PAIR(39) ); }
+            if (f >= 30 && f < 64) { mvwaddch(sessionWindow[1], 6, f-30, menuTitle[6][f-30] | A_BOLD | COLOR_PAIR(39) ); }
+
+            if (f == 0) { mvwprintw(sessionWindow[3], 1, 6, "The verdict is...."); }
+            if (f == 64)
+            {
+                if (sessionScore >= 10)
+                {
+                    mvwprintw(sessionWindow[3], 2, 11, "YOU WIN!");
+                    playGameWin1Sound(); playGameWin2Sound();
+                } else if (sessionScore < 10)
+                {
+                    mvwprintw(sessionWindow[3], 2, 10, "YOU LOSE..");
+                    playGameLossSound();
+                }
+                mvwprintw(sessionWindow[3], 3, 6, "(Your Score: %d/15)", sessionScore);
+                wbkgd(sessionWindow[3], COLOR_PAIR(24)); update_panels(); doupdate(); msleep(250); 
+                wbkgd(sessionWindow[3], COLOR_PAIR(38)); update_panels(); doupdate(); msleep(250); 
+                wbkgd(sessionWindow[3], COLOR_PAIR(24)); update_panels(); doupdate(); msleep(250); 
+                wbkgd(sessionWindow[3], COLOR_PAIR(38)); update_panels(); doupdate(); msleep(250); 
+                mvwprintw(sessionWindow[3], 5, 3, "(Your answers are below)");
+
+            }
+
+
+            // Show the score procedurally
+            if (f == 66) { mvwprintw(sessionWindow[2], 0, 14, "(1):   %c", sessionAnswers[0]);  }
+            if (f == 68) { mvwprintw(sessionWindow[2], 1, 14, "(2):   %c", sessionAnswers[1]);  }
+            if (f == 70) { mvwprintw(sessionWindow[2], 2, 14, "(3):   %c", sessionAnswers[2]);  }
+            if (f == 72) { mvwprintw(sessionWindow[2], 3, 14, "(4):   %c", sessionAnswers[3]);  }
+            if (f == 74) { mvwprintw(sessionWindow[2], 4, 14, "(5):   %c", sessionAnswers[4]);  }
+            if (f == 76) { mvwprintw(sessionWindow[2], 5, 14, "(6):   %c", sessionAnswers[5]);  }
+            if (f == 78) { mvwprintw(sessionWindow[2], 6, 14, "(7):   %c", sessionAnswers[6]);  }
+            if (f == 80) { mvwprintw(sessionWindow[2], 7, 14, "(8):   %c", sessionAnswers[7]);  }
+            if (f == 82) { mvwprintw(sessionWindow[2], 0, 45, "(9):   %c", sessionAnswers[8]);  }
+            if (f == 84) { mvwprintw(sessionWindow[2], 1, 45, "(10):  %c", sessionAnswers[9]);  }
+            if (f == 86) { mvwprintw(sessionWindow[2], 2, 45, "(11):  %c", sessionAnswers[10]); }
+            if (f == 88) { mvwprintw(sessionWindow[2], 3, 45, "(12):  %c", sessionAnswers[11]); }
+            if (f == 90) { mvwprintw(sessionWindow[2], 4, 45, "(13):  %c", sessionAnswers[12]); }
+            if (f == 92) { mvwprintw(sessionWindow[2], 5, 45, "(14):  %c", sessionAnswers[13]); }
+            if (f == 94) { mvwprintw(sessionWindow[2], 6, 45, "(15):  %c", sessionAnswers[14]); }
+            if (f == 96) { mvwprintw(sessionWindow[2], 7, 45, "Score: %d", sessionScore);       }
+            
+
+            msleep(25);
+            update_panels(); doupdate();
+        }
+
+        msleep(5000);
+        del_panel(sessionPanel[1]); DestroyWin(sessionWindow[1]);
+        del_panel(sessionPanel[2]); DestroyWin(sessionWindow[2]);
+        del_panel(sessionPanel[3]); DestroyWin(sessionWindow[3]);
+;
+        update_panels(); doupdate();
+
+        sessionWindow[1] = CreateNewWinBoxed(7, 40, (maxY / 2) - 6, (maxX - 40) / 2); // PlayAgain box
+        sessionWindow[2] = CreateNewWin(3,  15, (maxY / 2) -  3, (maxX - 36) / 2); // yes box
+        sessionWindow[3] = CreateNewWin(3,  15, (maxY / 2) -  3, (maxX + 6) / 2); // exit box
+        sessionPanel[1] = new_panel(sessionWindow[1]);
+        sessionPanel[2] = new_panel(sessionWindow[2]);
+        sessionPanel[3] = new_panel(sessionWindow[3]);
+        for (int d = 1; d <= 3; d++) { wbkgd(sessionWindow[d], COLOR_PAIR(38)); }
+        update_panels(); doupdate();
+
+        char yesBtn[4][15] =
+        {
+            { "             " },
+            { " -->  YES  <-- " },
+            { "      YES      " },
+            { "             " }
+        };
+        char leaveBtn[4][15] =
+        {
+            { "             " },
+            { " --> LEAVE <-- " },
+            { "     LEAVE     " },
+            { "             " }
+        };
+
+        mvwprintw(sessionWindow[1], 1, 5, "Would you like to continue??");
+        for (int v = 0; v < 15; v++)
+        {
+            int u = v-2;
+            if (v <= 12) { mvwaddch(sessionWindow[2], 0, v, yesBtn[0][v] | COLOR_PAIR(40) | A_BOLD); }
+            mvwaddch(sessionWindow[2], 1, v, yesBtn[1][v] | COLOR_PAIR(40) | A_BOLD);
+            if (v >= 2) { mvwaddch(sessionWindow[2], 2, v, yesBtn[3][u] | COLOR_PAIR(40) | A_BOLD); }
+        }
+        for (int v = 0; v < 15; v++)
+        {
+            int u = v-2;
+            if (v <= 12) { mvwaddch(sessionWindow[3], 0, v, leaveBtn[0][v] | COLOR_PAIR(40) | A_BOLD); }
+            mvwaddch(sessionWindow[3], 1, v, leaveBtn[2][v] | COLOR_PAIR(40) | A_BOLD);
+            if (v >= 2) { mvwaddch(sessionWindow[3], 2, v, leaveBtn[3][u] | COLOR_PAIR(40) | A_BOLD); }
+        }
+
+        // Add the input hints at the bottom of the window, then update screen
+    mvwprintw(sessionWindow[0], 29, 3, " (F1): Exit Now ");
+    mvwprintw(sessionWindow[0], 29, 31, " (^) (<) (v) (>) ");
+    mvwprintw(sessionWindow[0], 29, 60, " (ENTER): Select ");
+    update_panels();
+    doupdate();
+
+    // The menu keybinds and logic for responsive UI
+    int isInputBlocked, ch, selector = 1;
+    isInputBlocked = IsInputBlocked();
+    while((ch = getch()) != KEY_F(13)) // F13 is a nonstandard key
+    {
+        
+        msleep(25);
+
+        isInputBlocked = IsInputBlocked();
+        if (isInputBlocked == 0)
+        {
+            switch (ch) {
+                case KEY_UP:
+                case KEY_LEFT:
+                playNavSound();
+                // Make the selector move backwards
+                selector--;
+                if (selector < 1) { selector = 2; }
+                mvprintw(0, 0, "%d", selector); refresh();
+                break;
+                case KEY_DOWN:
+                case KEY_RIGHT:
+                playNavSound();
+                // Make the selector move forward
+                selector++;
+                if (selector > 2) { selector = 1; }
+                mvprintw(0, 0, "%d", selector); refresh();
+                break;
+                case KEY_F(1):
+                    endwin();
+                    exit(0);
+                case 10: // ASCII code of newline
+                case 13: // ASCII code of carriage return (kinda like a newline)
+                playEnterSound();
+                switch(selector)
+                {
+                    case 1:
+                        // Remove all playAgain-specific windows
+                        del_panel(sessionPanel[0]); DestroyWin(sessionWindow[0]);
+                        del_panel(sessionPanel[1]); DestroyWin(sessionWindow[1]);
+                        del_panel(sessionPanel[2]); DestroyWin(sessionWindow[2]);
+                        del_panel(sessionPanel[3]); DestroyWin(sessionWindow[3]);
+
+                        mainWindow[0] = CreateNewWinBoxed(30, 80, (maxY / 2) - 15, (maxX - 80) / 2);
+                        mainPanel[0] = new_panel(mainWindow[0]);
+                        update_panels(); doupdate();
+                        MainMenu(1, 1);
+                        break;
+                   
+                    case 2:
+                        // call a quit function, for now we will just endwin()
+                        endwin();
+                        exit(0);
+                }
+               default:
+                    break;
+            }
+        }
+
+        // refresh the buttons for responsiveness
+        if (selector == 1)
+        {
+            for (int v = 0; v < 15; v++)
+            {
+                mvwaddch(sessionWindow[2], 1, v, yesBtn[1][v] | COLOR_PAIR(40) | A_BOLD);
+                mvwaddch(sessionWindow[3], 1, v, leaveBtn[2][v] | COLOR_PAIR(40) | A_BOLD);
+            }
+        } else if (selector == 2)
+        {
+            for (int v = 0; v < 15; v++)
+            {
+                mvwaddch(sessionWindow[2], 1, v, yesBtn[2][v] | COLOR_PAIR(40) | A_BOLD);
+                mvwaddch(sessionWindow[3], 1, v, leaveBtn[1][v] | COLOR_PAIR(40) | A_BOLD);
+           } 
+        }
+        update_panels();
+        doupdate();
+     
+    }
 }
 
 

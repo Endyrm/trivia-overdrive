@@ -21,15 +21,20 @@ void PlayAudio(char *fileName);
 void ForkAndDetach(char *fileName);
 
 // Function Macro prototypes
-void playThudSound();       // Used in intro sequence
-void playRevealSound();     // Used for the intro sound that reveals the main menu
+void playThudSound();
+void playRevealSound();     
+void playPromptSound();
+void playNavSound();
+void playEnterSound();
+void playTackSound();
+
 
 void PlayAudio(char *fileName)
 {
     // Create a command string with the fileName
     char command[256];
-    sprintf(command, "vlc --quiet --intf dummy --play-and-exit %s &> /dev/null", fileName);
-
+    sprintf(command, "vlc --quiet --intf dummy --gain=0.25 --play-and-exit %s &> /dev/null", fileName);
+    
     // Play the audio via command execution
     system(command);
 }
@@ -89,7 +94,7 @@ void playNavSound() {
 }
 
 void playEnterSound() {
-    ForkAndDetach("./audio/ender.wav");
+    ForkAndDetach("./audio/enter.wav");
 }
 
 void playTackSound() {
@@ -101,13 +106,26 @@ void playCorrectSound() {
 }
 
 void playIncorrectSound() {
-    ForkAndDetach("./audio/correct.wav");
+    ForkAndDetach("./audio/incorrect.wav");
 }
 
-void playGameWinSound() {
-    ForkAndDetach("./audio/gameWin.wav");
+void playGameWin1Sound() {
+    ForkAndDetach("./audio/gameWin1.wav");
+}
+
+void playGameWin2Sound() {
+    ForkAndDetach("./audio/gameWin2.wav");
 }
 
 void playGameLossSound() {
+    ForkAndDetach("./audio/gameLoss.wav"); msleep(500);
+    ForkAndDetach("./audio/gameLoss.wav"); msleep(500);
+    ForkAndDetach("./audio/gameLoss.wav"); msleep(500);
+    ForkAndDetach("./audio/gameLoss.wav"); msleep(500);
     ForkAndDetach("./audio/gameLoss.wav");
+    
+}
+
+void playMenuTune() {
+    ForkAndDetach("./audio/menuTune.wav");
 }

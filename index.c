@@ -57,7 +57,7 @@ int main() {
     // Start the intro sequence towards the main menu
     IntroSequence();
     // Main menu initialization -- from now on all UI code runs under interface.c functions
-    MainMenu(1); // the 1 triggers the flash
+    MainMenu(1, 1); // the 1 triggers the flash, second 1 for music
     
     
     
@@ -68,4 +68,5 @@ int main() {
     endwin();
     printf("something made the program quit early\n");
     return 0;
+
 }
