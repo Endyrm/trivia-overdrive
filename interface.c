@@ -1146,6 +1146,7 @@ void StartGameSession(int topic) {
     mvwprintw(sessionWindow[0], 29, 3, " (F1): Exit Now ");
     mvwprintw(sessionWindow[0], 29, 31, " (^) (<) (v) (>) ");
     mvwprintw(sessionWindow[0], 29, 60, " (ENTER): Select ");
+    playPromptSound();
     update_panels();
     doupdate();
 
