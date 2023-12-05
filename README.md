@@ -3,8 +3,8 @@ Trivia Overdrive is a fun and simple terminal-based trivia game intended for my 
 
 ## TODO:
 The following are my goals with this project, as for what I can achieve by the submission date or beyond.
-- [*] Write the core functionality: the main functions that allow me to track scores, hold the questions, etc.
-- [*] Write the curses UI: the primary UI of the project
+- [x] Write the core functionality: the main functions that allow me to track scores, hold the questions, etc.
+- [x] Write the curses UI: the primary UI of the project
 - [ ] Automatically port to Windows: As explained above, we were technically required to build these applications on Windows to streamline the grading process, however it has evidently not been super possible to do. This is likely to be a github workflow.
 
 
