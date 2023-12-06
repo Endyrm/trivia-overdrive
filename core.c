@@ -64,7 +64,7 @@ char citiesOfCanadaQuestions[][201] =
 // Social Media Platforms questions
 char socialMediaPlatformQuestions[][201] =
 {
-    { "Which social media platform is used for video sharing?                                              Instagram                Twitter/X                Facebook                 Youtube                  1" },
+    { "Which social media platform is used for video sharing?                                              Instagram                Twitter/X                Facebook                 Youtube                  4" },
     { "Which of the following platforms is currently owned by Elon Musk?                                   Youtube                  Twitter/X                Tumblr                   Facebook                 2" },
     { "What best describes Twitter/X as a platform?                                                        Microblogging app        Video sharing app        Crowdfunding app         Livestreaming app        1" },
     { "Which platform makes video, voice and text chat easy AND historically was marketed for gamers?      Skype                    Teamspeak                IRC                      Discord                  4" },
