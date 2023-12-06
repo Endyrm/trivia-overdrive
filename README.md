@@ -1,4 +1,3 @@
-# Trivia Overdrive
 <h1 align="center">Trivia Overdrive</h1>
 <div align="center">
 	<a href="https://endyrm.org/">
