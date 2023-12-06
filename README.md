@@ -4,7 +4,7 @@
 	<a href="https://endyrm.org/">
 		<img src="https://img.shields.io/badge/Website-endyrm.org-blue.svg" alt="My website" />
 	</a>
-	![Lines of code](https://img.shields.io/tokei/lines/github/Endyrm/trivia-overdrive)
+    <img src="https://img.shields.io/tokei/lines/github/Endyrm/trivia-overdrive" alt="Lines of code" />
 </div>
 <div align="center">
     Command-line trivia game built with ncurses for a college class
