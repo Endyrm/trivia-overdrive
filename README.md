@@ -1,4 +1,15 @@
 # Trivia Overdrive
+<h1 align="center">Trivia Overdrive</h1>
+<div align="center">
+	<a href="https://endyrm.org/">
+		<img src="https://img.shields.io/badge/Website-endyrm.org-blue.svg" alt="My website" />
+	</a>
+	![Lines of code](https://img.shields.io/tokei/lines/github/Endyrm/trivia-overdrive)
+</div>
+<div align="center">
+    Command-line trivia game built with ncurses for a college class
+</div>
+
 Trivia Overdrive is a fun and simple terminal-based trivia game intended for my final project of the Microprocessors I course. It also utilizes ncurses for UI, as an extra fun attempt at UI/UX eye-candy and a personal challenge for bettering my skills. Due to some weird issues with attempting to include the PDcurses libraries on our Windows 11 lab computers, I opted to write this on Linux and potentially set up a github workflow to build the application automatically and perhaps have it compile a Windows-compatible version.
 
 ## TODO:
