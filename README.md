@@ -81,12 +81,12 @@ Note that during all animations, keypresses are put into a queue until arriving 
 
 ### Immediate exit cases
 Trivia Overdrive allows you to quit immediately without effort via `KEY_F(1)`, which is the `F1` key. The following scenarios are all places where the key can be used and is tested.
-|**Scenario**                        |**Action**    |**Expected behavior**|**Actual Behavior**|**Result**|
-|------------------------------------|--------------|---------------------|-------------------|----------|
-|Quit immediately from Main Menu     |Press KEY_F(1)|Quits immediately    |Quits immediately  |PASS      |
-|Quit immediately from Topic Selector|Press KEY_F(1)|Quits immediately    |Quits immediately  |PASS      |
-|Quit immediately during Game Session|Press KEY_F(1)|Quits immediately    |Quits immediately  |PASS      |
-|Quit immediately at final prompt    |Press KEY_F(1)|Quits immediately    |Quits immediately  |PASS      |
+|**Scenario**                        |**Action**      |**Expected behavior**|**Actual Behavior**|**Result**|
+|------------------------------------|----------------|---------------------|-------------------|----------|
+|Quit immediately from Main Menu     |Press `KEY_F(1)`|Quits immediately    |Quits immediately  |PASS      |
+|Quit immediately from Topic Selector|Press `KEY_F(1)`|Quits immediately    |Quits immediately  |PASS      |
+|Quit immediately during Game Session|Press `KEY_F(1)`|Quits immediately    |Quits immediately  |PASS      |
+|Quit immediately at final prompt    |Press `KEY_F(1)`|Quits immediately    |Quits immediately  |PASS      |
 
 
 ### Menu navigation cases
