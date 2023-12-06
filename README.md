@@ -172,6 +172,7 @@ graph LR;
     e-->t;
 ```
 
+Finally, note that all other input types not indicated with the hints on the footer of the primary window are ignored by the menus. Testing these everywhere is essentially futile as it by design does not care unless it's defined as a switch case.
 
 ## The point of this project being open-source
 I'm a huge proponent of free and open source software, regardless of how bad or stellar the quality of my work is. I know that my work may help someone with a similar idea or is just generally trying to learn C on their own, which is why I decided to license it under the MIT license. I would suggest as courtesy to also have your derivative projects be open source, but since I understand that some projects may not be allowed that luxury, you have that freedom as a result of the chosen license.
